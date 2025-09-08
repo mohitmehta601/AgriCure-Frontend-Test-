@@ -100,7 +100,7 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
 
       // If verification successful, complete signup (user already created by OTP)
       if (verifyData.user) {
-        const { data: signupData, error: signupError } = await authService.completeSignupAfterOTP({
+        const { error: signupError } = await authService.completeSignupAfterOTP({
           email: tempUserData.email,
           password: tempUserData.password,
           fullName: tempUserData.fullName,
@@ -109,7 +109,12 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
         }, verifyData.user.id);
 
         if (signupError) {
-          throw signupError;
+          console.error('Signup completion error:', signupError);
+          // Don't throw error, user is already created
+          toast({
+            title: "Account Created",
+            description: "Account created successfully. You may need to update your profile later.",
+          });
         }
       }
 
