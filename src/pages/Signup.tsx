@@ -100,7 +100,7 @@ const Signup = () => {
       toast({
         title: "Ready for Verification",
         description: "Please verify your account to complete registration",
-      }
+      });
     } catch (error: any) {
       console.error('Signup error:', error);
       toast({
