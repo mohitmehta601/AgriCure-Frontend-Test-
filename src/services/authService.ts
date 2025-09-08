@@ -127,6 +127,11 @@ export const authService = {
       return { data: null, error };
     }
   },
+
+  // Update user profile after signup
+  async updateUserProfileAfterSignup(data: SignUpData, userId: string) {
+    try {
+      const { data: updateData, error: profileError } = await supabase
         .from('user_profiles')
         .upsert({
           id: userId,
