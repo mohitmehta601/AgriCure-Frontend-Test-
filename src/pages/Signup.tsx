@@ -6,37 +6,69 @@ import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { authService } from "@/services/authService";
+import { authService, TempUserData } from "@/services/authService";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import OTPVerification from "@/components/OTPVerification";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
     productId: "",
     name: "",
+    mobileNumber: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showOTPVerification, setShowOTPVerification] = useState(false);
+  const [tempUserData, setTempUserData] = useState<TempUserData | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    
+    // Format mobile number (remove non-digits and limit to 10 digits)
+    if (e.target.name === 'mobileNumber') {
+      value = value.replace(/\D/g, '').slice(0, 10);
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: value
     }));
   };
 
+  const validateForm = () => {
+    const errors = [];
+    
+    if (!formData.productId.trim()) errors.push("Product ID is required");
+    if (!formData.name.trim()) errors.push("Full name is required");
+    if (!formData.email.trim()) errors.push("Email is required");
+    if (!formData.mobileNumber.trim()) errors.push("Mobile number is required");
+    if (formData.mobileNumber.length !== 10) errors.push("Mobile number must be 10 digits");
+    if (!formData.password) errors.push("Password is required");
+    if (formData.password.length < 6) errors.push("Password must be at least 6 characters");
+    if (formData.password !== formData.confirmPassword) errors.push("Passwords do not match");
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      errors.push("Please enter a valid email address");
+    }
+    
+    return errors;
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
+    const validationErrors = validateForm();
+    if (validationErrors.length > 0) {
       toast({
         title: t('common.error'),
-        description: t('auth.passwordsDoNotMatch'),
+        description: validationErrors[0],
         variant: "destructive"
       });
       return;
@@ -45,22 +77,30 @@ const Signup = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await authService.signUp({
-        email: formData.email,
-        password: formData.password,
-        fullName: formData.name,
-        productId: formData.productId,
-      });
-
-      if (error) {
-        throw error;
+      // Validate product ID first
+      const { isValid, error: productError } = await authService.validateProductId(formData.productId);
+      
+      if (!isValid) {
+        throw new Error('Invalid Product ID. Please enter a valid Product ID.');
       }
 
+      // Store temporary user data
+      const tempData: TempUserData = {
+        productId: formData.productId,
+        fullName: formData.name,
+        mobileNumber: formData.mobileNumber,
+        email: formData.email,
+        password: formData.password,
+      };
+      
+      await authService.storeTempUserData(tempData);
+      setTempUserData(tempData);
+      setShowOTPVerification(true);
+      
       toast({
-        title: t('auth.accountCreated'),
-        description: t('auth.welcomeToAgriCure'),
-      });
-      navigate("/login");
+        title: "Ready for Verification",
+        description: "Please verify your account to complete registration",
+      }
     } catch (error: any) {
       console.error('Signup error:', error);
       toast({
@@ -73,10 +113,42 @@ const Signup = () => {
     }
   };
 
+  const handleVerificationComplete = () => {
+    toast({
+      title: t('auth.accountCreated'),
+      description: t('auth.welcomeToAgriCure'),
+    });
+    navigate("/login");
+  };
+
+  const handleBackFromOTP = () => {
+    setShowOTPVerification(false);
+    setTempUserData(null);
+    authService.clearTempUserData();
+  };
   const handleBack = () => {
     navigate("/");
   };
 
+  if (showOTPVerification && tempUserData) {
+    return (
+      <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-6 md:mb-8">
+            <Link to="/" className="inline-flex items-center space-x-2">
+              <img src="/logo.png" alt="AgriCure Logo" className="h-8 w-8" />
+              <span className="text-2xl md:text-3xl font-bold text-grass-800">AgriCure</span>
+            </Link>
+          </div>
+          <OTPVerification
+            tempUserData={tempUserData}
+            onVerificationComplete={handleVerificationComplete}
+            onBack={handleBackFromOTP}
+          />
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -113,7 +185,7 @@ const Signup = () => {
           <CardContent className="px-4 md:px-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="productId" className="text-sm md:text-base">{t('auth.productId')}</Label>
+                <Label htmlFor="productId" className="text-sm md:text-base">Product ID *</Label>
                 <Input
                   id="productId"
                   name="productId"
@@ -139,6 +211,28 @@ const Signup = () => {
                 />
               </div>
               <div>
+                <Label htmlFor="mobileNumber" className="text-sm md:text-base">Mobile Number *</Label>
+                <div className="flex mt-1">
+                  <div className="flex items-center px-3 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md">
+                    <span className="text-sm text-gray-600">+91</span>
+                  </div>
+                  <Input
+                    id="mobileNumber"
+                    name="mobileNumber"
+                    type="tel"
+                    placeholder="9876543210"
+                    value={formData.mobileNumber}
+                    onChange={handleChange}
+                    required
+                    className="rounded-l-none"
+                    maxLength={10}
+                  />
+                </div>
+                {formData.mobileNumber && formData.mobileNumber.length !== 10 && (
+                  <p className="text-xs text-red-600 mt-1">Mobile number must be 10 digits</p>
+                )}
+              </div>
+              <div>
                 <Label htmlFor="email" className="text-sm md:text-base">{t('auth.email')}</Label>
                 <Input
                   id="email"
@@ -158,11 +252,12 @@ const Signup = () => {
                   id="password"
                   name="password"
                   type="password"
-                  placeholder="Create a password"
+                  placeholder="Create a password (min 6 characters)"
                   value={formData.password}
                   onChange={handleChange}
                   required
                   className="mt-1"
+                  minLength={6}
                 />
               </div>
               <div>
@@ -177,13 +272,16 @@ const Signup = () => {
                   required
                   className="mt-1"
                 />
+                {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                  <p className="text-xs text-red-600 mt-1">Passwords do not match</p>
+                )}
               </div>
               <Button 
                 type="submit" 
                 className="w-full bg-grass-600 hover:bg-grass-700 text-sm md:text-base py-2 md:py-3"
                 disabled={isLoading}
               >
-                {isLoading ? t('common.loading') : t('auth.createAccount')}
+                {isLoading ? "Validating..." : "Continue to Verification"}
               </Button>
             </form>
             

@@ -5,33 +5,71 @@ export interface SignUpData {
   password: string;
   fullName: string;
   productId: string;
-  farmLocation?: string;
+  mobileNumber: string;
 }
 
 export interface SignInData {
-  email: string;
+  emailOrPhone: string;
   password: string;
 }
 
+export interface TempUserData {
+  productId: string;
+  fullName: string;
+  mobileNumber: string;
+  email: string;
+  password: string;
+}
 export const authService = {
-  // Sign up new user
-  async signUp(data: SignUpData) {
+  // Validate product ID
+  async validateProductId(productId: string) {
     try {
-      // First, validate the product ID
-      const { data: productData, error: productError } = await supabase
+      const { data, error } = await supabase
         .from('products')
         .select('id')
-        .eq('id', data.productId)
+        .eq('id', productId)
         .eq('is_active', true)
         .single();
 
-      if (productError || !productData) {
-        throw new Error('Invalid Product ID. Please enter a valid Product ID.');
-      }
+      return { isValid: !!data && !error, error };
+    } catch (error) {
+      return { isValid: false, error };
+    }
+  },
 
+  // Store temporary user data (before verification)
+  async storeTempUserData(data: TempUserData) {
+    try {
+      // Store in localStorage temporarily
+      localStorage.setItem('tempUserData', JSON.stringify(data));
+      return { success: true, error: null };
+    } catch (error) {
+      return { success: false, error };
+    }
+  },
+
+  // Get temporary user data
+  getTempUserData(): TempUserData | null {
+    try {
+      const data = localStorage.getItem('tempUserData');
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      return null;
+    }
+  },
+
+  // Clear temporary user data
+  clearTempUserData() {
+    localStorage.removeItem('tempUserData');
+  },
+
+  // Complete signup after OTP verification
+  async signUp(data: SignUpData) {
+    try {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
+        phone: data.mobileNumber,
       });
 
       if (authError) throw authError;
@@ -44,7 +82,7 @@ export const authService = {
             id: authData.user.id,
             full_name: data.fullName,
             email: data.email,
-            farm_location: data.farmLocation,
+            phone_number: data.mobileNumber,
           });
 
         if (profileError) throw profileError;
@@ -59,6 +97,13 @@ export const authService = {
   // Sign in user
   async signIn(data: SignInData) {
     try {
+      // Determine if input is email or phone
+      const isEmail = data.emailOrPhone.includes('@');
+      
+      const signInData = isEmail 
+        ? { email: data.emailOrPhone, password: data.password }
+        : { phone: data.emailOrPhone, password: data.password };
+
       const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
