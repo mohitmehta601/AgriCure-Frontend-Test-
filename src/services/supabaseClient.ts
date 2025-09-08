@@ -16,6 +16,7 @@ export interface UserProfile {
   email: string;
   farm_location?: string;
   phone_number?: string;
+  product_id?: string;
   farm_size?: number;
   farm_size_unit?: string;
   created_at: string;
