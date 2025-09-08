@@ -73,8 +73,13 @@ const Login = () => {
     setIsLoading(true);
 
     try {
+      // Format the input properly
+      const formattedInput = emailOrPhone.includes('@') 
+        ? emailOrPhone 
+        : (emailOrPhone.startsWith('+') ? emailOrPhone : `+91${emailOrPhone}`);
+        
       const { data, error } = await authService.signIn({ 
-        emailOrPhone: emailOrPhone.includes('@') ? emailOrPhone : `+91${emailOrPhone}`, 
+        emailOrPhone: formattedInput, 
         password 
       });
       
@@ -93,7 +98,7 @@ const Login = () => {
       console.error('Login error:', error);
       toast({
         title: t('auth.loginFailed'),
-        description: error.message || t('auth.invalidCredentials'),
+        description: error.message || 'Invalid credentials. Please check your email/mobile and password.',
         variant: "destructive"
       });
     } finally {

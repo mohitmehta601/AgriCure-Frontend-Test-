@@ -81,14 +81,14 @@ const Signup = () => {
       const { isValid, error: productError } = await authService.validateProductId(formData.productId);
       
       if (!isValid) {
-        throw new Error('Invalid Product ID. Please enter a valid Product ID.');
+        throw new Error('Invalid Product ID. Please check your Product ID and try again.');
       }
 
       // Store temporary user data
       const tempData: TempUserData = {
         productId: formData.productId,
         fullName: formData.name,
-        mobileNumber: formData.mobileNumber,
+        mobileNumber: formData.mobileNumber.startsWith('+') ? formData.mobileNumber : `+91${formData.mobileNumber}`,
         email: formData.email,
         password: formData.password,
       };
@@ -99,7 +99,7 @@ const Signup = () => {
       
       toast({
         title: "Ready for Verification",
-        description: "Please verify your account to complete registration",
+        description: "Please choose your verification method to complete registration",
       });
     } catch (error: any) {
       console.error('Signup error:', error);

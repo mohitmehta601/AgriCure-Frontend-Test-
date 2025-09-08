@@ -63,51 +63,86 @@ export const authService = {
     localStorage.removeItem('tempUserData');
   },
 
-  // Complete signup after OTP verification
+  // Complete signup after OTP verification (user already created via OTP)
+  async completeSignupAfterOTP(data: SignUpData, userId: string) {
+    try {
+      // Update user metadata with additional information
+      const { data: updateData, error: updateError } = await supabase.auth.updateUser({
+        data: {
+          full_name: data.fullName,
+          product_id: data.productId,
+        }
+      });
+
+      if (updateError) throw updateError;
+
+      // Create or update user profile
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .upsert({
+          id: userId,
+          full_name: data.fullName,
+          email: data.email,
+          phone_number: data.mobileNumber.startsWith('+') ? data.mobileNumber : `+91${data.mobileNumber}`,
+        }, {
+          onConflict: 'id'
+        });
+
+      if (profileError) throw profileError;
+
+      return { data: updateData, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  // Traditional signup with email/password (fallback)
   async signUp(data: SignUpData) {
     try {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
-        phone: data.mobileNumber,
+        options: {
+          data: {
+            full_name: data.fullName,
+            product_id: data.productId,
+            phone_number: data.mobileNumber.startsWith('+') ? data.mobileNumber : `+91${data.mobileNumber}`,
+          }
+        }
       });
 
       if (authError) throw authError;
-
-      if (authData.user) {
-        // Create user profile
-        const { error: profileError } = await supabase
-          .from('user_profiles')
-          .insert({
-            id: authData.user.id,
-            full_name: data.fullName,
-            email: data.email,
-            phone_number: data.mobileNumber,
-          });
-
-        if (profileError) throw profileError;
-      }
 
       return { data: authData, error: null };
     } catch (error) {
       return { data: null, error };
     }
   },
-
   // Sign in user
   async signIn(data: SignInData) {
     try {
       // Determine if input is email or phone
       const isEmail = data.emailOrPhone.includes('@');
       
-      const signInData = isEmail 
-        ? { email: data.emailOrPhone, password: data.password }
-        : { phone: data.emailOrPhone, password: data.password };
+      let signInPayload;
+      
+      if (isEmail) {
+        signInPayload = { 
+          email: data.emailOrPhone, 
+          password: data.password 
+        };
+      } else {
+        // Format phone number for authentication
+        const formattedPhone = data.emailOrPhone.startsWith('+') 
+          ? data.emailOrPhone 
+          : `+91${data.emailOrPhone}`;
+        signInPayload = { 
+          phone: formattedPhone, 
+          password: data.password 
+        };
+      }
 
-      const { data: authData, error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
+      const { data: authData, error } = await supabase.auth.signInWithPassword(signInPayload);
 
       return { data: authData, error };
     } catch (error) {

@@ -40,9 +40,12 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
     try {
       let result;
       if (selectedMethod === 'email') {
-        result = await otpService.sendEmailOTP(tempUserData.email);
+        result = await otpService.sendEmailOTPForSignup(tempUserData.email);
       } else {
-        result = await otpService.sendPhoneOTP(tempUserData.mobileNumber);
+        const formattedPhone = tempUserData.mobileNumber.startsWith('+') 
+          ? tempUserData.mobileNumber 
+          : `+91${tempUserData.mobileNumber}`;
+        result = await otpService.sendPhoneOTPForSignup(formattedPhone);
       }
 
       if (result.error) {
@@ -84,7 +87,9 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
         type: selectedMethod,
         token: otp,
         email: selectedMethod === 'email' ? tempUserData.email : undefined,
-        phone: selectedMethod === 'phone' ? tempUserData.mobileNumber : undefined,
+        phone: selectedMethod === 'phone' 
+          ? (tempUserData.mobileNumber.startsWith('+') ? tempUserData.mobileNumber : `+91${tempUserData.mobileNumber}`)
+          : undefined,
       };
 
       const { data: verifyData, error: verifyError } = await otpService.verifyOTP(verificationData);
@@ -93,17 +98,19 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
         throw verifyError;
       }
 
-      // If verification successful, complete signup
-      const { data: signupData, error: signupError } = await authService.signUp({
-        email: tempUserData.email,
-        password: tempUserData.password,
-        fullName: tempUserData.fullName,
-        productId: tempUserData.productId,
-        mobileNumber: tempUserData.mobileNumber,
-      });
+      // If verification successful, complete signup (user already created by OTP)
+      if (verifyData.user) {
+        const { data: signupData, error: signupError } = await authService.completeSignupAfterOTP({
+          email: tempUserData.email,
+          password: tempUserData.password,
+          fullName: tempUserData.fullName,
+          productId: tempUserData.productId,
+          mobileNumber: tempUserData.mobileNumber,
+        }, verifyData.user.id);
 
-      if (signupError) {
-        throw signupError;
+        if (signupError) {
+          throw signupError;
+        }
       }
 
       // Clear temporary data
@@ -130,10 +137,12 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
   const resendOTP = async () => {
     setIsResending(true);
     try {
-      const result = await otpService.resendOTP({
+      const result = await otpService.resendOTPForSignup({
         type: selectedMethod,
         email: selectedMethod === 'email' ? tempUserData.email : undefined,
-        phone: selectedMethod === 'phone' ? tempUserData.mobileNumber : undefined,
+        phone: selectedMethod === 'phone' 
+          ? (tempUserData.mobileNumber.startsWith('+') ? tempUserData.mobileNumber : `+91${tempUserData.mobileNumber}`)
+          : undefined,
       });
 
       if (result.error) {
