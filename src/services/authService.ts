@@ -66,56 +66,34 @@ export const authService = {
   // Complete signup after OTP verification (user already created via OTP)
   async completeSignupAfterOTP(data: SignUpData, userId: string) {
     try {
-      // First, update user metadata
-      const { error: updateError } = await supabase.auth.updateUser({
-        data: {
-          full_name: data.fullName,
-          product_id: data.productId,
-          phone_number: data.mobileNumber,
-        }
-      });
-
-      if (updateError) {
-        console.error('Error updating user metadata:', updateError);
-        // Don't throw here, continue with profile creation
-      }
-
-      // Create or update user profile with retry logic
-      const maxRetries = 3;
-      let profileError = null;
+      // Wait a moment for the trigger to complete
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        const { error } = await supabase
+      // Check if profile was created by trigger, if not create manually
+      const { data: existingProfile } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('id', userId)
+        .single();
+      
+      if (!existingProfile) {
+        // Create profile manually if trigger failed
+        const { error: profileError } = await supabase
           .from('user_profiles')
-          .upsert({
+          .insert({
             id: userId,
             full_name: data.fullName,
             email: data.email,
             phone_number: data.mobileNumber.startsWith('+') ? data.mobileNumber : `+91${data.mobileNumber}`,
+            product_id: data.productId,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
-          }, {
-            onConflict: 'id',
-            ignoreDuplicates: false
           });
         
-        if (!error) {
-          profileError = null;
-          break;
+        if (profileError) {
+          console.error('Manual profile creation failed:', profileError);
+          // Don't throw error, user is already created in auth
         }
-        
-        profileError = error;
-        console.warn(`Profile creation attempt ${attempt} failed:`, error);
-        
-        // Wait before retry
-        if (attempt < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-      }
-
-      if (profileError) {
-        console.error('Failed to create user profile after retries:', profileError);
-        // Don't throw error, user is already created in auth
       }
 
       // Get the current user data to return

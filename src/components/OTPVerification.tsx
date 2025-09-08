@@ -98,9 +98,9 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
         throw verifyError;
       }
 
-      // If verification successful, complete signup (user already created by OTP)
+      // If verification successful, complete signup
       if (verifyData.user) {
-        const { error: signupError } = await authService.completeSignupAfterOTP({
+        const { data: signupData, error: signupError } = await authService.completeSignupAfterOTP({
           email: tempUserData.email,
           password: tempUserData.password,
           fullName: tempUserData.fullName,
@@ -109,12 +109,7 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
         }, verifyData.user.id);
 
         if (signupError) {
-          console.error('Signup completion error:', signupError);
-          // Don't throw error, user is already created
-          toast({
-            title: "Account Created",
-            description: "Account created successfully. You may need to update your profile later.",
-          });
+          throw new Error('Failed to complete account setup. Please try again.');
         }
       }
 
@@ -129,9 +124,20 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
       onVerificationComplete();
     } catch (error: any) {
       console.error('Error verifying OTP:', error);
+      
+      // Handle specific error cases
+      let errorMessage = "Invalid OTP. Please try again.";
+      if (error.message?.includes('expired')) {
+        errorMessage = "OTP has expired. Please request a new one.";
+      } else if (error.message?.includes('invalid')) {
+        errorMessage = "Invalid OTP code. Please check and try again.";
+      } else if (error.message?.includes('setup')) {
+        errorMessage = "Account verification successful but profile setup incomplete. Please contact support.";
+      }
+      
       toast({
         title: "Verification Failed",
-        description: error.message || "Invalid OTP. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
