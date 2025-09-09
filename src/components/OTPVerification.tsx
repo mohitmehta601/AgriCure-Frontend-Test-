@@ -38,20 +38,26 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
   const sendOTP = async () => {
     setIsLoading(true);
     try {
+      console.log('Attempting to send OTP via:', selectedMethod);
+      
       let result;
       if (selectedMethod === 'email') {
+        console.log('Sending email OTP to:', tempUserData.email);
         result = await otpService.sendEmailOTPForSignup(tempUserData.email);
       } else {
         const formattedPhone = tempUserData.mobileNumber.startsWith('+') 
           ? tempUserData.mobileNumber 
           : `+91${tempUserData.mobileNumber}`;
+        console.log('Sending phone OTP to:', formattedPhone);
         result = await otpService.sendPhoneOTPForSignup(formattedPhone);
       }
 
       if (result.error) {
+        console.error('OTP send error:', result.error);
         throw result.error;
       }
 
+      console.log('OTP sent successfully');
       setOtpSent(true);
       setCountdown(60); // 60 seconds countdown
       toast({
@@ -59,10 +65,10 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
         description: `Verification code sent to your ${selectedMethod === 'email' ? 'email' : 'mobile number'}`,
       });
     } catch (error: any) {
-      console.error('Error sending OTP:', error);
+      console.error('Error sending OTP:', error.message || error);
       toast({
         title: "Failed to Send OTP",
-        description: error.message || "Please try again",
+        description: error.message || "Please check your internet connection and try again",
         variant: "destructive"
       });
     } finally {
@@ -82,9 +88,11 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
 
     setIsLoading(true);
     try {
+      console.log('Attempting to verify OTP:', { method: selectedMethod, otpLength: otp.length });
+      
       // Verify OTP
       const verificationData = {
-        type: selectedMethod,
+        type: selectedMethod === 'email' ? 'email' : 'sms' as 'email' | 'sms',
         token: otp,
         email: selectedMethod === 'email' ? tempUserData.email : undefined,
         phone: selectedMethod === 'phone' 
@@ -95,12 +103,20 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
       const { data: verifyData, error: verifyError } = await otpService.verifyOTP(verificationData);
       
       if (verifyError) {
+        console.error('OTP verification error:', verifyError);
         throw verifyError;
       }
 
+      console.log('OTP verification successful, user created:', verifyData.user?.id);
+      
       // If verification successful, complete signup
       if (verifyData.user) {
-        const { data: signupData, error: signupError } = await authService.completeSignupAfterOTP({
+        console.log('Completing signup after OTP verification...');
+        
+        // Wait a moment for any database triggers to complete
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        const { error: signupError } = await authService.completeSignupAfterOTP({
           email: tempUserData.email,
           password: tempUserData.password,
           fullName: tempUserData.fullName,
@@ -109,8 +125,11 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
         }, verifyData.user.id);
 
         if (signupError) {
+          console.error('Signup completion error:', signupError);
           throw new Error('Failed to complete account setup. Please try again.');
         }
+        
+        console.log('Signup completed successfully');
       }
 
       // Clear temporary data
@@ -123,16 +142,22 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
 
       onVerificationComplete();
     } catch (error: any) {
-      console.error('Error verifying OTP:', error);
+      console.error('Error verifying OTP:', error.message || error);
       
       // Handle specific error cases
       let errorMessage = "Invalid OTP. Please try again.";
-      if (error.message?.includes('expired')) {
+      if (error.message?.includes('expired') || error.message?.includes('Token has expired')) {
         errorMessage = "OTP has expired. Please request a new one.";
-      } else if (error.message?.includes('invalid')) {
+      } else if (error.message?.includes('invalid') || error.message?.includes('Invalid token')) {
         errorMessage = "Invalid OTP code. Please check and try again.";
       } else if (error.message?.includes('setup')) {
         errorMessage = "Account verification successful but profile setup incomplete. Please contact support.";
+      } else if (error.message?.includes('Email not confirmed')) {
+        errorMessage = "Email verification failed. Please try again or use a different email.";
+      } else if (error.message?.includes('Phone not confirmed')) {
+        errorMessage = "Phone verification failed. Please try again or use a different number.";
+      } else if (error.message) {
+        errorMessage = error.message;
       }
       
       toast({
@@ -148,6 +173,8 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
   const resendOTP = async () => {
     setIsResending(true);
     try {
+      console.log('Resending OTP via:', selectedMethod);
+      
       const result = await otpService.resendOTPForSignup({
         type: selectedMethod,
         email: selectedMethod === 'email' ? tempUserData.email : undefined,
@@ -157,9 +184,11 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
       });
 
       if (result.error) {
+        console.error('OTP resend error:', result.error);
         throw result.error;
       }
 
+      console.log('OTP resent successfully');
       setCountdown(60);
       toast({
         title: "OTP Resent",
@@ -168,7 +197,7 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
     } catch (error: any) {
       toast({
         title: "Failed to Resend OTP",
-        description: error.message || "Please try again",
+        description: error.message || "Please check your connection and try again",
         variant: "destructive"
       });
     } finally {

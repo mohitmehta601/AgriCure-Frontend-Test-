@@ -77,13 +77,19 @@ const Signup = () => {
     setIsLoading(true);
 
     try {
+      console.log('Starting signup process...');
+      
       // Validate product ID first
+      console.log('Validating product ID:', formData.productId);
       const { isValid, error: productError } = await authService.validateProductId(formData.productId);
       
       if (!isValid) {
+        console.error('Product ID validation failed:', productError);
         throw new Error('Invalid Product ID. Please check your Product ID and try again.');
       }
 
+      console.log('Product ID validated successfully');
+      
       // Store temporary user data
       const tempData: TempUserData = {
         productId: formData.productId,
@@ -93,19 +99,21 @@ const Signup = () => {
         password: formData.password,
       };
       
+      console.log('Storing temporary user data...');
       await authService.storeTempUserData(tempData);
       setTempUserData(tempData);
       setShowOTPVerification(true);
       
+      console.log('Proceeding to OTP verification');
       toast({
         title: "Ready for Verification",
         description: "Please choose your verification method to complete registration",
       });
     } catch (error: any) {
-      console.error('Signup error:', error);
+      console.error('Signup error:', error.message || error);
       toast({
         title: t('auth.signupFailed'),
-        description: error.message || t('auth.failedToCreateAccount'),
+        description: error.message || 'Please check your details and try again',
         variant: "destructive"
       });
     } finally {

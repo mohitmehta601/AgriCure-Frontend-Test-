@@ -66,8 +66,10 @@ export const authService = {
   // Complete signup after OTP verification (user already created via OTP)
   async completeSignupAfterOTP(data: SignUpData, userId: string) {
     try {
+      console.log('Completing signup for user:', userId);
+      
       // Wait a moment for the trigger to complete
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
       
       // Check if profile was created by trigger, if not create manually
       const { data: existingProfile } = await supabase
@@ -77,6 +79,8 @@ export const authService = {
         .single();
       
       if (!existingProfile) {
+        console.log('Profile not found, creating manually...');
+        
         // Create profile manually if trigger failed
         const { error: profileError } = await supabase
           .from('user_profiles')
@@ -86,6 +90,7 @@ export const authService = {
             email: data.email,
             phone_number: data.mobileNumber.startsWith('+') ? data.mobileNumber : `+91${data.mobileNumber}`,
             product_id: data.productId,
+            product_id: data.productId,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           });
@@ -93,15 +98,20 @@ export const authService = {
         if (profileError) {
           console.error('Manual profile creation failed:', profileError);
           // Don't throw error, user is already created in auth
+        } else {
+          console.log('Profile created manually');
         }
+      } else {
+        console.log('Profile already exists from trigger');
       }
 
       // Get the current user data to return
       const { data: userData, error: getUserError } = await supabase.auth.getUser();
       
+      console.log('Signup completion successful');
       return { data: userData, error: getUserError };
     } catch (error) {
-      console.error('Complete signup error:', error);
+      console.error('Complete signup error:', error.message || error);
       return { data: null, error };
     }
   },
@@ -153,6 +163,8 @@ export const authService = {
   // Sign in user
   async signIn(data: SignInData) {
     try {
+      console.log('Attempting sign in for:', data.emailOrPhone);
+      
       // Determine if input is email or phone
       const isEmail = data.emailOrPhone.includes('@');
       
@@ -174,6 +186,7 @@ export const authService = {
         };
       }
 
+      console.log('Sign in payload prepared:', { isEmail, hasPassword: !!data.password });
       const { data: authData, error } = await supabase.auth.signInWithPassword(signInPayload);
 
       return { data: authData, error };

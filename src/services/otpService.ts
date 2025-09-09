@@ -1,7 +1,7 @@
 import { supabase } from './supabaseClient';
 
 export interface OTPVerificationData {
-  type: 'email' | 'phone';
+  type: 'email' | 'sms';
   token: string;
   phone?: string;
   email?: string;
@@ -17,20 +17,38 @@ export const otpService = {
   // Send OTP via email for signup (creates new user)
   async sendEmailOTPForSignup(email: string) {
     try {
+      console.log('Sending email OTP for signup to:', email);
+      
       const { data, error } = await supabase.auth.signInWithOtp({
         email: email,
         options: {
-          shouldCreateUser: true, // Allow new user creation
+          shouldCreateUser: true,
+          emailRedirectTo: undefined, // Prevent redirect for OTP flow
           data: {
-            email_confirm: true,
+            email_confirm: false, // We'll handle confirmation via OTP
           }
         }
       });
 
-      return { data, error };
-    } catch (error) {
+      if (error) {
+        console.error('Email OTP signup error:', error);
+        throw error;
+      }
+
+      console.log('Email OTP sent successfully:', data);
+      return { data, error: null };
+    } catch (error: any) {
       console.error('Email OTP signup error:', error);
-      return { data: null, error };
+      
+      // Handle specific error cases
+      if (error.message?.includes('Signups not allowed')) {
+        throw new Error('Email signup is disabled. Please contact support or enable email signups in Supabase dashboard.');
+      }
+      if (error.message?.includes('User already registered')) {
+        throw new Error('This email is already registered. Please use the login page instead.');
+      }
+      
+      throw new Error(error.message || 'Failed to send email OTP');
     }
   },
 
@@ -38,47 +56,88 @@ export const otpService = {
   async sendPhoneOTPForSignup(phone: string) {
     try {
       // Ensure phone number is in international format
-      const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`;
+      const formattedPhone = this.formatPhoneNumber(phone);
+      console.log('Sending phone OTP for signup to:', formattedPhone);
+      
+      if (!this.isValidPhoneNumber(phone)) {
+        throw new Error('Invalid phone number format. Please enter a valid 10-digit mobile number.');
+      }
       
       const { data, error } = await supabase.auth.signInWithOtp({
         phone: formattedPhone,
         options: {
-          shouldCreateUser: true, // Allow new user creation
+          shouldCreateUser: true,
           data: {
-            phone_confirm: true,
+            phone_confirm: false, // We'll handle confirmation via OTP
           }
         }
       });
 
-      return { data, error };
-    } catch (error) {
+      if (error) {
+        console.error('Phone OTP signup error:', error);
+        throw error;
+      }
+
+      console.log('Phone OTP sent successfully:', data);
+      return { data, error: null };
+    } catch (error: any) {
       console.error('Phone OTP signup error:', error);
-      return { data: null, error };
+      
+      // Handle specific error cases
+      if (error.message?.includes('Signups not allowed')) {
+        throw new Error('Phone signup is disabled. Please contact support or enable phone signups in Supabase dashboard.');
+      }
+      if (error.message?.includes('User already registered')) {
+        throw new Error('This phone number is already registered. Please use the login page instead.');
+      }
+      if (error.message?.includes('SMS provider')) {
+        throw new Error('SMS service is not configured. Please contact support.');
+      }
+      
+      throw new Error(error.message || 'Failed to send SMS OTP');
     }
   },
 
   // Send OTP via email for existing users (login)
   async sendEmailOTPForLogin(email: string) {
     try {
+      console.log('Sending email OTP for login to:', email);
+      
       const { data, error } = await supabase.auth.signInWithOtp({
         email: email,
         options: {
           shouldCreateUser: false, // Only existing users
+          emailRedirectTo: undefined, // Prevent redirect for OTP flow
         }
       });
 
-      return { data, error };
-    } catch (error) {
+      if (error) {
+        console.error('Email OTP login error:', error);
+        throw error;
+      }
+
+      console.log('Email OTP for login sent successfully:', data);
+      return { data, error: null };
+    } catch (error: any) {
       console.error('Email OTP login error:', error);
-      return { data: null, error };
+      
+      if (error.message?.includes('User not found')) {
+        throw new Error('No account found with this email. Please sign up first.');
+      }
+      
+      throw new Error(error.message || 'Failed to send email OTP');
     }
   },
 
   // Send OTP via phone for existing users (login)
   async sendPhoneOTPForLogin(phone: string) {
     try {
-      // Ensure phone number is in international format
-      const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`;
+      const formattedPhone = this.formatPhoneNumber(phone);
+      console.log('Sending phone OTP for login to:', formattedPhone);
+      
+      if (!this.isValidPhoneNumber(phone)) {
+        throw new Error('Invalid phone number format. Please enter a valid 10-digit mobile number.');
+      }
       
       const { data, error } = await supabase.auth.signInWithOtp({
         phone: formattedPhone,
@@ -87,48 +146,93 @@ export const otpService = {
         }
       });
 
-      return { data, error };
-    } catch (error) {
+      if (error) {
+        console.error('Phone OTP login error:', error);
+        throw error;
+      }
+
+      console.log('Phone OTP for login sent successfully:', data);
+      return { data, error: null };
+    } catch (error: any) {
       console.error('Phone OTP login error:', error);
-      return { data: null, error };
+      
+      if (error.message?.includes('User not found')) {
+        throw new Error('No account found with this phone number. Please sign up first.');
+      }
+      if (error.message?.includes('SMS provider')) {
+        throw new Error('SMS service is not configured. Please contact support.');
+      }
+      
+      throw new Error(error.message || 'Failed to send SMS OTP');
     }
   },
 
   // Verify OTP for both signup and login
   async verifyOTP(verificationData: OTPVerificationData) {
     try {
+      console.log('Verifying OTP:', { type: verificationData.type, hasToken: !!verificationData.token });
+      
       const { data, error } = await supabase.auth.verifyOtp({
-        type: verificationData.type === 'email' ? 'email' : 'sms',
+        type: verificationData.type, // 'email' or 'sms'
         token: verificationData.token,
         email: verificationData.email,
         phone: verificationData.phone,
       });
 
-      return { data, error };
-    } catch (error) {
+      if (error) {
+        console.error('OTP verification error:', error);
+        throw error;
+      }
+
+      console.log('OTP verification successful:', data);
+      return { data, error: null };
+    } catch (error: any) {
       console.error('OTP verification error:', error);
-      return { data: null, error };
+      
+      // Handle specific error cases
+      if (error.message?.includes('Token has expired')) {
+        throw new Error('OTP has expired. Please request a new one.');
+      }
+      if (error.message?.includes('Invalid token')) {
+        throw new Error('Invalid OTP code. Please check and try again.');
+      }
+      if (error.message?.includes('Email not confirmed')) {
+        throw new Error('Email verification failed. Please try again.');
+      }
+      if (error.message?.includes('Phone not confirmed')) {
+        throw new Error('Phone verification failed. Please try again.');
+      }
+      
+      throw new Error(error.message || 'OTP verification failed');
     }
   },
 
   // Resend OTP for signup
   async resendOTPForSignup(data: SendOTPData) {
-    if (data.type === 'email' && data.email) {
-      return this.sendEmailOTPForSignup(data.email);
-    } else if (data.type === 'phone' && data.phone) {
-      return this.sendPhoneOTPForSignup(data.phone);
+    try {
+      if (data.type === 'email' && data.email) {
+        return await this.sendEmailOTPForSignup(data.email);
+      } else if (data.type === 'phone' && data.phone) {
+        return await this.sendPhoneOTPForSignup(data.phone);
+      }
+      throw new Error('Invalid resend data provided');
+    } catch (error) {
+      return { data: null, error };
     }
-    return { data: null, error: new Error('Invalid OTP resend data') };
   },
 
   // Resend OTP for login
   async resendOTPForLogin(data: SendOTPData) {
-    if (data.type === 'email' && data.email) {
-      return this.sendEmailOTPForLogin(data.email);
-    } else if (data.type === 'phone' && data.phone) {
-      return this.sendPhoneOTPForLogin(data.phone);
+    try {
+      if (data.type === 'email' && data.email) {
+        return await this.sendEmailOTPForLogin(data.email);
+      } else if (data.type === 'phone' && data.phone) {
+        return await this.sendPhoneOTPForLogin(data.phone);
+      }
+      throw new Error('Invalid resend data provided');
+    } catch (error) {
+      return { data: null, error };
     }
-    return { data: null, error: new Error('Invalid OTP resend data') };
   },
 
   // Format phone number to international format
