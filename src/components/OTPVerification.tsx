@@ -36,6 +36,16 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
   }, [countdown]);
 
   const sendOTP = async () => {
+    // Check network connectivity first
+    if (!navigator.onLine) {
+      toast({
+        title: "No Internet Connection",
+        description: "Please check your internet connection and try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       console.log('Attempting to send OTP via:', selectedMethod);
@@ -66,9 +76,25 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
       });
     } catch (error: any) {
       console.error('Error sending OTP:', error.message || error);
+      
+      // Handle network-specific errors
+      let errorMessage = "Failed to send OTP. Please try again.";
+      
+      if (error.message?.includes('Network connection failed') || 
+          error.message?.includes('Failed to fetch') ||
+          error.message?.includes('ERR_NETWORK_CHANGED')) {
+        errorMessage = "Network connection failed. Please check your internet connection and try again.";
+      } else if (error.message?.includes('Signups not allowed')) {
+        errorMessage = "OTP signup is disabled. Please contact support.";
+      } else if (error.message?.includes('already registered')) {
+        errorMessage = "This account already exists. Please use the login page instead.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Failed to Send OTP",
-        description: error.message || "Please check your internet connection and try again",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -81,6 +107,16 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
       toast({
         title: "Invalid OTP",
         description: "Please enter a valid 6-digit OTP",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check network connectivity first
+    if (!navigator.onLine) {
+      toast({
+        title: "No Internet Connection",
+        description: "Please check your internet connection and try again.",
         variant: "destructive"
       });
       return;
@@ -144,9 +180,14 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
     } catch (error: any) {
       console.error('Error verifying OTP:', error.message || error);
       
-      // Handle specific error cases
-      let errorMessage = "Invalid OTP. Please try again.";
-      if (error.message?.includes('expired') || error.message?.includes('Token has expired')) {
+      // Enhanced error handling for network and OTP issues
+      let errorMessage = "OTP verification failed. Please try again.";
+      
+      if (error.message?.includes('Network connection failed') || 
+          error.message?.includes('Failed to fetch') ||
+          error.message?.includes('ERR_NETWORK_CHANGED')) {
+        errorMessage = "Network connection failed. Please check your internet connection and try again.";
+      } else if (error.message?.includes('expired') || error.message?.includes('Token has expired')) {
         errorMessage = "OTP has expired. Please request a new one.";
       } else if (error.message?.includes('invalid') || error.message?.includes('Invalid token')) {
         errorMessage = "Invalid OTP code. Please check and try again.";
