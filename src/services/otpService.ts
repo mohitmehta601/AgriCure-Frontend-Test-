@@ -102,11 +102,31 @@ export const otpService = {
   async sendPhoneOTPForSignup(phone: string) {
     return retryNetworkRequest(async () => {
       try {
-        // Ensure phone number is in international format
-        const formattedPhone = this.formatPhoneNumber(phone);
+        // Clean and format phone number properly
+        const cleanPhone = phone.replace(/\D/g, '');
+        let formattedPhone = phone;
+        
+        // Format based on phone number length and pattern
+        if (cleanPhone.length === 10 && cleanPhone.match(/^[6-9]/)) {
+          formattedPhone = `+91${cleanPhone}`;
+        } else if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+          formattedPhone = `+${cleanPhone}`;
+        } else if (cleanPhone.length === 13 && cleanPhone.startsWith('91')) {
+          formattedPhone = `+${cleanPhone}`;
+        } else if (!phone.startsWith('+91')) {
+          // Try to extract 10 digits if possible
+          const extractedDigits = cleanPhone.slice(-10);
+          if (extractedDigits.match(/^[6-9]\d{9}$/)) {
+            formattedPhone = `+91${extractedDigits}`;
+          } else {
+            throw new Error('Invalid phone number format. Please enter a valid 10-digit mobile number.');
+          }
+        }
+        
         console.log('Sending phone OTP for signup to:', formattedPhone);
         
-        if (!this.isValidPhoneNumber(phone)) {
+        // Validate the final formatted phone number
+        if (!this.isValidFormattedPhoneNumber(formattedPhone)) {
           throw new Error('Invalid phone number format. Please enter a valid 10-digit mobile number.');
         }
         
@@ -234,12 +254,23 @@ export const otpService = {
           throw new Error('No internet connection. Please check your network and try again.');
         }
         
-        const { data, error } = await supabase.auth.verifyOtp({
-          type: verificationData.type, // 'email' or 'sms'
-          token: verificationData.token,
-          email: verificationData.email,
-          phone: verificationData.phone,
-        });
+        let otpData: any;
+        
+        if (verificationData.type === 'email') {
+          otpData = {
+            type: 'email' as const,
+            token: verificationData.token,
+            email: verificationData.email,
+          };
+        } else {
+          otpData = {
+            type: 'sms' as const,
+            token: verificationData.token,
+            phone: verificationData.phone,
+          };
+        }
+        
+        const { data, error } = await supabase.auth.verifyOtp(otpData);
 
         if (error) {
           console.error('OTP verification error:', error);
@@ -321,7 +352,22 @@ export const otpService = {
     const cleanPhone = phone.replace(/\D/g, '');
     
     // Check if it's a valid 10-digit Indian mobile number
-    return /^[6-9]\d{9}$/.test(cleanPhone);
+    // OR if it's already formatted with +91 (13 digits total)
+    if (cleanPhone.length === 10) {
+      return /^[6-9]\d{9}$/.test(cleanPhone);
+    } else if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+      return /^91[6-9]\d{9}$/.test(cleanPhone);
+    } else if (cleanPhone.length === 13 && cleanPhone.startsWith('91')) {
+      return /^91[6-9]\d{9}$/.test(cleanPhone);
+    }
+    
+    return false;
+  },
+
+  // Validate formatted phone number (with +91 prefix)
+  isValidFormattedPhoneNumber(phone: string): boolean {
+    // Should be in format +91xxxxxxxxxx where x is 10 digits starting with 6-9
+    return /^\+91[6-9]\d{9}$/.test(phone);
   },
 
   // Validate email format

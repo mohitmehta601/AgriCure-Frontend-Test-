@@ -1,9 +1,21 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Mail, Smartphone, RefreshCw, CheckCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Mail,
+  Smartphone,
+  RefreshCw,
+  CheckCircle,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { otpService } from "@/services/otpService";
 import { authService, TempUserData } from "@/services/authService";
@@ -16,8 +28,14 @@ interface OTPVerificationProps {
   onBack: () => void;
 }
 
-const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVerificationProps) => {
-  const [selectedMethod, setSelectedMethod] = useState<'email' | 'phone'>('email');
+const OTPVerification = ({
+  tempUserData,
+  onVerificationComplete,
+  onBack,
+}: OTPVerificationProps) => {
+  const [selectedMethod, setSelectedMethod] = useState<"email" | "phone">(
+    "email"
+  );
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -41,61 +59,77 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
       toast({
         title: "No Internet Connection",
         description: "Please check your internet connection and try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
     setIsLoading(true);
     try {
-      console.log('Attempting to send OTP via:', selectedMethod);
-      
+      console.log("Attempting to send OTP via:", selectedMethod);
+
       let result;
-      if (selectedMethod === 'email') {
-        console.log('Sending email OTP to:', tempUserData.email);
+      if (selectedMethod === "email") {
+        console.log("Sending email OTP to:", tempUserData.email);
         result = await otpService.sendEmailOTPForSignup(tempUserData.email);
       } else {
-        const formattedPhone = tempUserData.mobileNumber.startsWith('+') 
-          ? tempUserData.mobileNumber 
-          : `+91${tempUserData.mobileNumber}`;
-        console.log('Sending phone OTP to:', formattedPhone);
+        // Clean and validate phone number first
+        const cleanPhone = tempUserData.mobileNumber.replace(/\D/g, "");
+        let formattedPhone = tempUserData.mobileNumber;
+
+        // Format phone number properly
+        if (cleanPhone.length === 10 && cleanPhone.match(/^[6-9]/)) {
+          formattedPhone = `+91${cleanPhone}`;
+        } else if (cleanPhone.length === 12 && cleanPhone.startsWith("91")) {
+          formattedPhone = `+${cleanPhone}`;
+        } else if (!formattedPhone.startsWith("+91")) {
+          formattedPhone = `+91${cleanPhone}`;
+        }
+
+        console.log("Sending phone OTP to:", formattedPhone);
         result = await otpService.sendPhoneOTPForSignup(formattedPhone);
       }
 
       if (result.error) {
-        console.error('OTP send error:', result.error);
+        console.error("OTP send error:", result.error);
         throw result.error;
       }
 
-      console.log('OTP sent successfully');
+      console.log("OTP sent successfully");
       setOtpSent(true);
       setCountdown(60); // 60 seconds countdown
       toast({
         title: "OTP Sent",
-        description: `Verification code sent to your ${selectedMethod === 'email' ? 'email' : 'mobile number'}`,
+        description: `Verification code sent to your ${
+          selectedMethod === "email" ? "email" : "mobile number"
+        }`,
       });
     } catch (error: any) {
-      console.error('Error sending OTP:', error.message || error);
-      
+      console.error("Error sending OTP:", error.message || error);
+
       // Handle network-specific errors
       let errorMessage = "Failed to send OTP. Please try again.";
-      
-      if (error.message?.includes('Network connection failed') || 
-          error.message?.includes('Failed to fetch') ||
-          error.message?.includes('ERR_NETWORK_CHANGED')) {
-        errorMessage = "Network connection failed. Please check your internet connection and try again.";
-      } else if (error.message?.includes('Signups not allowed')) {
+
+      if (
+        error.message?.includes("Network connection failed") ||
+        error.message?.includes("Failed to fetch") ||
+        error.message?.includes("ERR_NETWORK_CHANGED")
+      ) {
+        errorMessage =
+          "Network connection failed. Please check your internet connection and try again.";
+      } else if (error.message?.includes("Signups not allowed")) {
         errorMessage = "OTP signup is disabled. Please contact support.";
-      } else if (error.message?.includes('already registered')) {
-        errorMessage = "This account already exists. Please use the login page instead.";
+      } else if (error.message?.includes("already registered")) {
+        errorMessage =
+          "This account already exists. Please use the login page instead.";
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       toast({
         title: "Failed to Send OTP",
         description: errorMessage,
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -107,7 +141,7 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
       toast({
         title: "Invalid OTP",
         description: "Please enter a valid 6-digit OTP",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -117,55 +151,82 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
       toast({
         title: "No Internet Connection",
         description: "Please check your internet connection and try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
     setIsLoading(true);
     try {
-      console.log('Attempting to verify OTP:', { method: selectedMethod, otpLength: otp.length });
-      
+      console.log("Attempting to verify OTP:", {
+        method: selectedMethod,
+        otpLength: otp.length,
+      });
+
       // Verify OTP
       const verificationData = {
-        type: selectedMethod === 'email' ? 'email' : 'sms' as 'email' | 'sms',
+        type: selectedMethod === "email" ? "email" : ("sms" as "email" | "sms"),
         token: otp,
-        email: selectedMethod === 'email' ? tempUserData.email : undefined,
-        phone: selectedMethod === 'phone' 
-          ? (tempUserData.mobileNumber.startsWith('+') ? tempUserData.mobileNumber : `+91${tempUserData.mobileNumber}`)
-          : undefined,
+        email: selectedMethod === "email" ? tempUserData.email : undefined,
+        phone:
+          selectedMethod === "phone"
+            ? (() => {
+                const cleanPhone = tempUserData.mobileNumber.replace(/\D/g, "");
+                if (cleanPhone.length === 10 && cleanPhone.match(/^[6-9]/)) {
+                  return `+91${cleanPhone}`;
+                } else if (
+                  cleanPhone.length === 12 &&
+                  cleanPhone.startsWith("91")
+                ) {
+                  return `+${cleanPhone}`;
+                } else if (tempUserData.mobileNumber.startsWith("+91")) {
+                  return tempUserData.mobileNumber;
+                } else {
+                  return `+91${cleanPhone}`;
+                }
+              })()
+            : undefined,
       };
 
-      const { data: verifyData, error: verifyError } = await otpService.verifyOTP(verificationData);
-      
+      const { data: verifyData, error: verifyError } =
+        await otpService.verifyOTP(verificationData);
+
       if (verifyError) {
-        console.error('OTP verification error:', verifyError);
+        console.error("OTP verification error:", verifyError);
         throw verifyError;
       }
 
-      console.log('OTP verification successful, user created:', verifyData.user?.id);
-      
+      console.log(
+        "OTP verification successful, user created:",
+        verifyData.user?.id
+      );
+
       // If verification successful, complete signup
       if (verifyData.user) {
-        console.log('Completing signup after OTP verification...');
-        
+        console.log("Completing signup after OTP verification...");
+
         // Wait a moment for any database triggers to complete
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        const { error: signupError } = await authService.completeSignupAfterOTP({
-          email: tempUserData.email,
-          password: tempUserData.password,
-          fullName: tempUserData.fullName,
-          productId: tempUserData.productId,
-          mobileNumber: tempUserData.mobileNumber,
-        }, verifyData.user.id);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        const { error: signupError } = await authService.completeSignupAfterOTP(
+          {
+            email: tempUserData.email,
+            password: tempUserData.password,
+            fullName: tempUserData.fullName,
+            productId: tempUserData.productId,
+            mobileNumber: tempUserData.mobileNumber,
+          },
+          verifyData.user.id
+        );
 
         if (signupError) {
-          console.error('Signup completion error:', signupError);
-          throw new Error('Failed to complete account setup. Please try again.');
+          console.error("Signup completion error:", signupError);
+          throw new Error(
+            "Failed to complete account setup. Please try again."
+          );
         }
-        
-        console.log('Signup completed successfully');
+
+        console.log("Signup completed successfully");
       }
 
       // Clear temporary data
@@ -178,33 +239,45 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
 
       onVerificationComplete();
     } catch (error: any) {
-      console.error('Error verifying OTP:', error.message || error);
-      
+      console.error("Error verifying OTP:", error.message || error);
+
       // Enhanced error handling for network and OTP issues
       let errorMessage = "OTP verification failed. Please try again.";
-      
-      if (error.message?.includes('Network connection failed') || 
-          error.message?.includes('Failed to fetch') ||
-          error.message?.includes('ERR_NETWORK_CHANGED')) {
-        errorMessage = "Network connection failed. Please check your internet connection and try again.";
-      } else if (error.message?.includes('expired') || error.message?.includes('Token has expired')) {
+
+      if (
+        error.message?.includes("Network connection failed") ||
+        error.message?.includes("Failed to fetch") ||
+        error.message?.includes("ERR_NETWORK_CHANGED")
+      ) {
+        errorMessage =
+          "Network connection failed. Please check your internet connection and try again.";
+      } else if (
+        error.message?.includes("expired") ||
+        error.message?.includes("Token has expired")
+      ) {
         errorMessage = "OTP has expired. Please request a new one.";
-      } else if (error.message?.includes('invalid') || error.message?.includes('Invalid token')) {
+      } else if (
+        error.message?.includes("invalid") ||
+        error.message?.includes("Invalid token")
+      ) {
         errorMessage = "Invalid OTP code. Please check and try again.";
-      } else if (error.message?.includes('setup')) {
-        errorMessage = "Account verification successful but profile setup incomplete. Please contact support.";
-      } else if (error.message?.includes('Email not confirmed')) {
-        errorMessage = "Email verification failed. Please try again or use a different email.";
-      } else if (error.message?.includes('Phone not confirmed')) {
-        errorMessage = "Phone verification failed. Please try again or use a different number.";
+      } else if (error.message?.includes("setup")) {
+        errorMessage =
+          "Account verification successful but profile setup incomplete. Please contact support.";
+      } else if (error.message?.includes("Email not confirmed")) {
+        errorMessage =
+          "Email verification failed. Please try again or use a different email.";
+      } else if (error.message?.includes("Phone not confirmed")) {
+        errorMessage =
+          "Phone verification failed. Please try again or use a different number.";
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       toast({
         title: "Verification Failed",
         description: errorMessage,
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -214,32 +287,50 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
   const resendOTP = async () => {
     setIsResending(true);
     try {
-      console.log('Resending OTP via:', selectedMethod);
-      
+      console.log("Resending OTP via:", selectedMethod);
+
       const result = await otpService.resendOTPForSignup({
         type: selectedMethod,
-        email: selectedMethod === 'email' ? tempUserData.email : undefined,
-        phone: selectedMethod === 'phone' 
-          ? (tempUserData.mobileNumber.startsWith('+') ? tempUserData.mobileNumber : `+91${tempUserData.mobileNumber}`)
-          : undefined,
+        email: selectedMethod === "email" ? tempUserData.email : undefined,
+        phone:
+          selectedMethod === "phone"
+            ? (() => {
+                const cleanPhone = tempUserData.mobileNumber.replace(/\D/g, "");
+                if (cleanPhone.length === 10 && cleanPhone.match(/^[6-9]/)) {
+                  return `+91${cleanPhone}`;
+                } else if (
+                  cleanPhone.length === 12 &&
+                  cleanPhone.startsWith("91")
+                ) {
+                  return `+${cleanPhone}`;
+                } else if (tempUserData.mobileNumber.startsWith("+91")) {
+                  return tempUserData.mobileNumber;
+                } else {
+                  return `+91${cleanPhone}`;
+                }
+              })()
+            : undefined,
       });
 
       if (result.error) {
-        console.error('OTP resend error:', result.error);
+        console.error("OTP resend error:", result.error);
         throw result.error;
       }
 
-      console.log('OTP resent successfully');
+      console.log("OTP resent successfully");
       setCountdown(60);
       toast({
         title: "OTP Resent",
-        description: `New verification code sent to your ${selectedMethod === 'email' ? 'email' : 'mobile number'}`,
+        description: `New verification code sent to your ${
+          selectedMethod === "email" ? "email" : "mobile number"
+        }`,
       });
     } catch (error: any) {
       toast({
         title: "Failed to Resend OTP",
-        description: error.message || "Please check your connection and try again",
-        variant: "destructive"
+        description:
+          error.message || "Please check your connection and try again",
+        variant: "destructive",
       });
     } finally {
       setIsResending(false);
@@ -254,8 +345,9 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
   };
 
   const maskEmail = (email: string) => {
-    const [username, domain] = email.split('@');
-    const maskedUsername = username.slice(0, 2) + '*'.repeat(username.length - 2);
+    const [username, domain] = email.split("@");
+    const maskedUsername =
+      username.slice(0, 2) + "*".repeat(username.length - 2);
     return `${maskedUsername}@${domain}`;
   };
 
@@ -280,35 +372,41 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
           Choose your preferred verification method
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent className="px-4 md:px-6 space-y-6">
         {!otpSent ? (
           <>
             {/* Verification Method Selection */}
             <div className="space-y-4">
-              <Label className="text-sm font-medium">Choose Verification Method</Label>
+              <Label className="text-sm font-medium">
+                Choose Verification Method
+              </Label>
               <div className="grid grid-cols-2 gap-3">
                 <Button
-                  variant={selectedMethod === 'email' ? 'default' : 'outline'}
-                  onClick={() => setSelectedMethod('email')}
+                  variant={selectedMethod === "email" ? "default" : "outline"}
+                  onClick={() => setSelectedMethod("email")}
                   className="flex items-center space-x-2 h-auto py-3"
                 >
                   <Mail className="h-4 w-4" />
                   <div className="text-left">
                     <div className="text-sm font-medium">Email</div>
-                    <div className="text-xs opacity-70">{maskEmail(tempUserData.email)}</div>
+                    <div className="text-xs opacity-70">
+                      {maskEmail(tempUserData.email)}
+                    </div>
                   </div>
                 </Button>
-                
+
                 <Button
-                  variant={selectedMethod === 'phone' ? 'default' : 'outline'}
-                  onClick={() => setSelectedMethod('phone')}
+                  variant={selectedMethod === "phone" ? "default" : "outline"}
+                  onClick={() => setSelectedMethod("phone")}
                   className="flex items-center space-x-2 h-auto py-3"
                 >
                   <Smartphone className="h-4 w-4" />
                   <div className="text-left">
                     <div className="text-sm font-medium">SMS</div>
-                    <div className="text-xs opacity-70">{formatPhoneNumber(tempUserData.mobileNumber)}</div>
+                    <div className="text-xs opacity-70">
+                      {formatPhoneNumber(tempUserData.mobileNumber)}
+                    </div>
                   </div>
                 </Button>
               </div>
@@ -326,7 +424,7 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
                   <span>Sending OTP...</span>
                 </div>
               ) : (
-                `Send OTP via ${selectedMethod === 'email' ? 'Email' : 'SMS'}`
+                `Send OTP via ${selectedMethod === "email" ? "Email" : "SMS"}`
               )}
             </Button>
           </>
@@ -335,16 +433,22 @@ const OTPVerification = ({ tempUserData, onVerificationComplete, onBack }: OTPVe
             {/* OTP Input */}
             <div className="text-center space-y-4">
               <div className="flex items-center justify-center space-x-2">
-                {selectedMethod === 'email' ? (
+                {selectedMethod === "email" ? (
                   <Mail className="h-5 w-5 text-grass-600" />
                 ) : (
                   <Smartphone className="h-5 w-5 text-grass-600" />
                 )}
-                <Badge variant="secondary" className="bg-grass-100 text-grass-800">
-                  OTP sent to {selectedMethod === 'email' ? maskEmail(tempUserData.email) : formatPhoneNumber(tempUserData.mobileNumber)}
+                <Badge
+                  variant="secondary"
+                  className="bg-grass-100 text-grass-800"
+                >
+                  OTP sent to{" "}
+                  {selectedMethod === "email"
+                    ? maskEmail(tempUserData.email)
+                    : formatPhoneNumber(tempUserData.mobileNumber)}
                 </Badge>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="otp" className="text-sm font-medium">
                   Enter 6-digit verification code
