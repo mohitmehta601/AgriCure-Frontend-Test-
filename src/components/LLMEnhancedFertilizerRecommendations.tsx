@@ -82,7 +82,7 @@ const LLMEnhancedFertilizerRecommendations = ({
         <CardHeader className="px-4 sm:px-6">
           <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
             <Brain className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600 animate-pulse" />
-            <span>🤖 AI-Powered Analysis</span>
+            <span>AI-Powered Analysis</span>
             <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
               Enhanced ML + LLM
             </Badge>
@@ -351,7 +351,7 @@ const LLMEnhancedFertilizerRecommendations = ({
         <CardHeader className="px-4 sm:px-6">
           <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
             <Sprout className="h-5 w-5 text-green-600" />
-            <span>🌱 Organic Alternatives</span>
+            <span>Organic Alternatives</span>
           </CardTitle>
           <CardDescription className="text-sm sm:text-base">
             Sustainable and eco-friendly fertilizer options
@@ -401,7 +401,7 @@ const LLMEnhancedFertilizerRecommendations = ({
           <CardHeader className="px-4 sm:px-6">
             <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
               <Calendar className="h-5 w-5 text-purple-600" />
-              <span>📅 Application Timing</span>
+              <span>Application Timing</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
@@ -446,7 +446,7 @@ const LLMEnhancedFertilizerRecommendations = ({
           <CardHeader className="px-4 sm:px-6">
             <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
               <Calculator className="h-5 w-5 text-green-600" />
-              <span>💰 Cost Analysis</span>
+              <span>Cost Analysis</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="px-4 sm:px-6">

@@ -110,7 +110,7 @@ const Recommendations = () => {
             </h1>
             <p className="text-sm sm:text-base text-gray-600">
               {shouldUseLLMComponent
-                ? "🤖 AI-Enhanced Recommendations"
+                ? "AI-Enhanced Recommendations"
                 : t("recommendations.subtitle")}{" "}
               - {farmName}
             </p>
