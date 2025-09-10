@@ -1,4 +1,4 @@
-import { mlApiService } from './mlApiService';
+import { mlApiService, EnhancedFertilizerInput, LLMEnhancedOutput } from './mlApiService';
 
 export interface MLPredictionInput {
   temperature: number;
@@ -9,11 +9,67 @@ export interface MLPredictionInput {
   nitrogen: number;
   potassium: number;
   phosphorus: number;
+  pH?: number;
+}
+
+export interface EnhancedMLPredictionInput extends MLPredictionInput {
+  sowingDate?: string;
+  fieldSize?: number;
+  fieldUnit?: string;
+  bulkDensity?: number;
+  samplingDepth?: number;
 }
 
 export interface MLPredictionResult {
   fertilizer: string;
   confidence: number;
+}
+
+export interface EnhancedMLPredictionResult {
+  predictions: Record<string, string>;
+  confidences: Record<string, number>;
+  prediction_info: {
+    model_type: string;
+    features_used: string[];
+    targets: string[];
+  };
+}
+
+export interface LLMEnhancedMLResult {
+  ml_predictions: Record<string, any>;
+  soil_analysis: Record<string, any>;
+  primary_fertilizer: {
+    name: string;
+    npk: string;
+    rate_per_hectare: number;
+    cost_per_hectare: number;
+    total_cost: number;
+    application_notes: string;
+  };
+  secondary_fertilizer: {
+    name: string;
+    npk: string;
+    rate_per_hectare: number;
+    cost_per_hectare: number;
+    total_cost: number;
+    application_notes: string;
+  };
+  organic_alternatives: Array<{
+    name: string;
+    rate_per_hectare: number;
+    cost_per_hectare: number;
+    total_cost: number;
+    benefits: string;
+  }>;
+  application_timing: Record<string, string>;
+  cost_summary: {
+    primary_cost: number;
+    secondary_cost: number;
+    organic_cost: number;
+    total: number;
+    per_hectare: number;
+    currency: string;
+  };
 }
 
 export const CROP_TYPES = {
@@ -145,9 +201,102 @@ export const FERTILIZER_INFO = {
   }
 };
 
+// Fallback prediction function for when ML API is not available
+const fallbackPrediction = async (input: MLPredictionInput): Promise<MLPredictionResult> => {
+  const { temperature, humidity, moisture, soilType, cropType, nitrogen, potassium, phosphorus } = input;
+
+  let predictedFertilizer = 'Urea';
+  let confidence = 85;
+
+  if (cropType === 0 || cropType === 4) {
+    if (nitrogen < 50) {
+      predictedFertilizer = 'Urea';
+      confidence = 92;
+    } else if (phosphorus < 30) {
+      predictedFertilizer = 'DAP';
+      confidence = 88;
+    } else {
+      predictedFertilizer = 'TSP';
+      confidence = 85;
+    }
+  } else if (cropType === 1) {
+    if (phosphorus < 20) {
+      predictedFertilizer = 'DAP';
+      confidence = 94;
+    } else if (nitrogen < 30) {
+      predictedFertilizer = '28-28';
+      confidence = 89;
+    } else {
+      predictedFertilizer = '20-20';
+      confidence = 86;
+    }
+  } else if (cropType === 10) {
+    if (potassium < 30) {
+      predictedFertilizer = 'Potassium sulfate';
+      confidence = 91;
+    } else if (nitrogen > 100) {
+      predictedFertilizer = 'DAP';
+      confidence = 87;
+    } else {
+      predictedFertilizer = '14-35-14';
+      confidence = 84;
+    }
+  } else if (cropType === 5 || cropType === 13 || cropType === 16) {
+    if (phosphorus > 30) {
+      predictedFertilizer = '14-14-14';
+      confidence = 90;
+    } else if (potassium < 20) {
+      predictedFertilizer = '10-26-26';
+      confidence = 88;
+    } else {
+      predictedFertilizer = 'TSP';
+      confidence = 85;
+    }
+  } else if (cropType === 3) {
+    predictedFertilizer = '15-15-15';
+    confidence = 93;
+  } else if (cropType === 11) {
+    if (nitrogen > 80) {
+      predictedFertilizer = 'Urea';
+      confidence = 95;
+    } else {
+      predictedFertilizer = 'DAP';
+      confidence = 89;
+    }
+  } else {
+    if (nitrogen < 20 && phosphorus < 20 && potassium < 20) {
+      predictedFertilizer = '17-17-17';
+      confidence = 87;
+    } else if (nitrogen < 15) {
+      predictedFertilizer = 'Urea';
+      confidence = 90;
+    } else if (phosphorus < 15) {
+      predictedFertilizer = 'DAP';
+      confidence = 88;
+    } else if (potassium < 15) {
+      predictedFertilizer = 'Potassium sulfate';
+      confidence = 86;
+    } else {
+      predictedFertilizer = '14-14-14';
+      confidence = 83;
+    }
+  }
+
+  if (temperature < 15 || temperature > 40) confidence -= 5;
+  if (humidity < 30 || humidity > 90) confidence -= 3;
+  if (moisture < 20 || moisture > 90) confidence -= 4;
+
+  confidence = Math.max(75, Math.min(98, confidence));
+
+  return {
+    fertilizer: predictedFertilizer,
+    confidence
+  };
+};
+
 export const predictFertilizer = async (input: MLPredictionInput): Promise<MLPredictionResult> => {
   try {
-    const { temperature, humidity, moisture, soilType, cropType, nitrogen, potassium, phosphorus } = input;
+    const { temperature, humidity, moisture, soilType, cropType, nitrogen, potassium, phosphorus, pH } = input;
     
     const cropName = Object.keys(CROP_TYPES).find(key => CROP_TYPES[key as keyof typeof CROP_TYPES] === cropType) || 'Wheat';
     const soilName = Object.keys(SOIL_TYPES).find(key => SOIL_TYPES[key as keyof typeof SOIL_TYPES] === soilType) || 'Loamy';
@@ -160,7 +309,8 @@ export const predictFertilizer = async (input: MLPredictionInput): Promise<MLPre
       Crop_Type: cropName,
       Nitrogen: nitrogen,
       Potassium: potassium,
-      Phosphorous: phosphorus
+      Phosphorous: phosphorus,
+      pH: pH || 6.5
     };
 
     const response = await mlApiService.getPrediction(mlInput);
@@ -171,96 +321,84 @@ export const predictFertilizer = async (input: MLPredictionInput): Promise<MLPre
     };
   } catch (error) {
     console.error('ML API prediction failed, falling back to rule-based prediction:', error);
+    return await fallbackPrediction(input);
+  }
+};
+
+export const predictFertilizerEnhanced = async (input: MLPredictionInput): Promise<EnhancedMLPredictionResult> => {
+  try {
+    const { temperature, humidity, moisture, soilType, cropType, nitrogen, potassium, phosphorus, pH } = input;
     
-    const { temperature, humidity, moisture, soilType, cropType, nitrogen, potassium, phosphorus } = input;
-
-    let predictedFertilizer = 'Urea';
-    let confidence = 85;
-
-    if (cropType === 0 || cropType === 4) {
-      if (nitrogen < 50) {
-        predictedFertilizer = 'Urea';
-        confidence = 92;
-      } else if (phosphorus < 30) {
-        predictedFertilizer = 'DAP';
-        confidence = 88;
-      } else {
-        predictedFertilizer = 'TSP';
-        confidence = 85;
-      }
-    } else if (cropType === 1) {
-      if (phosphorus < 20) {
-        predictedFertilizer = 'DAP';
-        confidence = 94;
-      } else if (nitrogen < 30) {
-        predictedFertilizer = '28-28';
-        confidence = 89;
-      } else {
-        predictedFertilizer = '20-20';
-        confidence = 86;
-      }
-    } else if (cropType === 10) {
-      if (potassium < 30) {
-        predictedFertilizer = 'Potassium sulfate';
-        confidence = 91;
-      } else if (nitrogen > 100) {
-        predictedFertilizer = 'DAP';
-        confidence = 87;
-      } else {
-        predictedFertilizer = '14-35-14';
-        confidence = 84;
-      }
-    } else if (cropType === 5 || cropType === 13 || cropType === 16) {
-      if (phosphorus > 30) {
-        predictedFertilizer = '14-14-14';
-        confidence = 90;
-      } else if (potassium < 20) {
-        predictedFertilizer = '10-26-26';
-        confidence = 88;
-      } else {
-        predictedFertilizer = 'TSP';
-        confidence = 85;
-      }
-    } else if (cropType === 3) {
-      predictedFertilizer = '15-15-15';
-      confidence = 93;
-    } else if (cropType === 11) {
-      if (nitrogen > 80) {
-        predictedFertilizer = 'Urea';
-        confidence = 95;
-      } else {
-        predictedFertilizer = 'DAP';
-        confidence = 89;
-      }
-    } else {
-      if (nitrogen < 20 && phosphorus < 20 && potassium < 20) {
-        predictedFertilizer = '17-17-17';
-        confidence = 87;
-      } else if (nitrogen < 15) {
-        predictedFertilizer = 'Urea';
-        confidence = 90;
-      } else if (phosphorus < 15) {
-        predictedFertilizer = 'DAP';
-        confidence = 88;
-      } else if (potassium < 15) {
-        predictedFertilizer = 'Potassium sulfate';
-        confidence = 86;
-      } else {
-        predictedFertilizer = '14-14-14';
-        confidence = 83;
-      }
-    }
-
-    if (temperature < 15 || temperature > 40) confidence -= 5;
-    if (humidity < 30 || humidity > 90) confidence -= 3;
-    if (moisture < 20 || moisture > 90) confidence -= 4;
-
-    confidence = Math.max(75, Math.min(98, confidence));
-
-    return {
-      fertilizer: predictedFertilizer,
-      confidence
+    const cropName = Object.keys(CROP_TYPES).find(key => CROP_TYPES[key as keyof typeof CROP_TYPES] === cropType) || 'Wheat';
+    const soilName = Object.keys(SOIL_TYPES).find(key => SOIL_TYPES[key as keyof typeof SOIL_TYPES] === soilType) || 'Loamy';
+    
+    const mlInput = {
+      Temperature: temperature,
+      Humidity: humidity,
+      Moisture: moisture,
+      Soil_Type: soilName,
+      Crop_Type: cropName,
+      Nitrogen: nitrogen,
+      Potassium: potassium,
+      Phosphorous: phosphorus,
+      pH: pH || 6.5
     };
+
+    const response = await mlApiService.getEnhancedPrediction(mlInput);
+    
+    return {
+      predictions: response.predictions,
+      confidences: response.confidences,
+      prediction_info: response.prediction_info
+    };
+  } catch (error) {
+    console.error('Enhanced ML API prediction failed:', error);
+    throw error;
+  }
+};
+
+export const predictFertilizerWithLLM = async (input: EnhancedMLPredictionInput): Promise<LLMEnhancedMLResult> => {
+  try {
+    const { 
+      temperature, humidity, moisture, soilType, cropType, 
+      nitrogen, potassium, phosphorus, pH,
+      sowingDate, fieldSize, fieldUnit, bulkDensity, samplingDepth 
+    } = input;
+    
+    const cropName = Object.keys(CROP_TYPES).find(key => CROP_TYPES[key as keyof typeof CROP_TYPES] === cropType) || 'Wheat';
+    const soilName = Object.keys(SOIL_TYPES).find(key => SOIL_TYPES[key as keyof typeof SOIL_TYPES] === soilType) || 'Loamy';
+    
+    const enhancedInput: EnhancedFertilizerInput = {
+      Temperature: temperature,
+      Humidity: humidity,
+      Moisture: moisture,
+      Soil_Type: soilName,
+      Crop_Type: cropName,
+      Nitrogen: nitrogen,
+      Potassium: potassium,
+      Phosphorous: phosphorus,
+      pH: pH || 6.5,
+      Sowing_Date: sowingDate,
+      Field_Size: fieldSize || 1.0,
+      Field_Unit: fieldUnit || 'hectares',
+      Bulk_Density_g_cm3: bulkDensity || 1.3,
+      Sampling_Depth_cm: samplingDepth || 15.0
+    };
+
+    const response = await mlApiService.getLLMEnhancedPrediction(enhancedInput);
+    
+    return {
+      ml_predictions: response.ml_model_prediction,
+      soil_analysis: response.soil_condition,
+      primary_fertilizer: response.primary_fertilizer,
+      secondary_fertilizer: response.secondary_fertilizer,
+      organic_alternatives: response.organic_alternatives,
+      application_timing: response.application_timing,
+      cost_summary: response.cost_estimate
+    };
+  } catch (error) {
+    console.error('LLM Enhanced ML API prediction failed:', error);
+    throw error;
   }
 };
 

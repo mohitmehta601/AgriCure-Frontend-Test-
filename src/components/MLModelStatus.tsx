@@ -1,8 +1,20 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Brain, CheckCircle, XCircle, RefreshCw, AlertTriangle } from "lucide-react";
+import {
+  Brain,
+  CheckCircle,
+  XCircle,
+  RefreshCw,
+  AlertTriangle,
+} from "lucide-react";
 import { mlApiService, ModelInfo } from "@/services/mlApiService";
 import { useToast } from "@/hooks/use-toast";
 
@@ -18,21 +30,32 @@ const MLModelStatus = () => {
     try {
       const health = await mlApiService.healthCheck();
       setIsConnected(health.model_loaded);
-      
+
       if (health.model_loaded) {
-        const info = await mlApiService.getModelInfo();
-        setModelInfo(info);
+        try {
+          const info = await mlApiService.getModelInfo();
+          setModelInfo(info);
+        } catch (modelInfoError) {
+          console.warn(
+            "Failed to get model info, but model is loaded:",
+            modelInfoError
+          );
+          setModelInfo(null);
+        }
+      } else {
+        setModelInfo(null);
       }
-      
+
       setLastChecked(new Date());
     } catch (error) {
-      console.error('Failed to check ML model status:', error);
+      console.error("Failed to check ML model status:", error);
       setIsConnected(false);
       setModelInfo(null);
       toast({
         title: "ML Model Status",
-        description: "Unable to connect to ML model. Using fallback predictions.",
-        variant: "destructive"
+        description:
+          "Unable to connect to ML model. Using fallback predictions.",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -41,7 +64,7 @@ const MLModelStatus = () => {
 
   useEffect(() => {
     checkModelStatus();
-    
+
     const interval = setInterval(checkModelStatus, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
@@ -68,7 +91,7 @@ const MLModelStatus = () => {
                 <XCircle className="h-5 w-5 text-red-600" />
               )}
               <span className="font-medium">
-                {isConnected ? 'Connected' : 'Disconnected'}
+                {isConnected ? "Connected" : "Disconnected"}
               </span>
             </div>
             <Button
@@ -78,7 +101,9 @@ const MLModelStatus = () => {
               disabled={isLoading}
               className="flex items-center space-x-2"
             >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+              />
               <span>Refresh</span>
             </Button>
           </div>
@@ -89,28 +114,41 @@ const MLModelStatus = () => {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Model Type:</span>
-                  <Badge variant="secondary">{modelInfo.model_type}</Badge>
+                  <Badge variant="secondary">
+                    {modelInfo.model_type || "Unknown"}
+                  </Badge>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Available Features:</span>
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    {modelInfo.available_soil_types.length + modelInfo.available_crop_types.length + modelInfo.available_fertilizers.length}
+                  <span className="text-sm text-gray-600">Total Features:</span>
+                  <Badge
+                    variant="secondary"
+                    className="bg-blue-100 text-blue-800"
+                  >
+                    {modelInfo.features?.length || 0}
                   </Badge>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Soil Types:</span>
-                  <span className="text-sm font-medium">{modelInfo.available_soil_types.length}</span>
+                  <span className="text-sm text-gray-600">
+                    Available Models:
+                  </span>
+                  <span className="text-sm font-medium">
+                    {Object.keys(modelInfo.available_models || {}).length}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Crop Types:</span>
-                  <span className="text-sm font-medium">{modelInfo.available_crop_types.length}</span>
+                  <span className="text-sm text-gray-600">Targets:</span>
+                  <span className="text-sm font-medium">
+                    {modelInfo.targets?.length || 0}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Fertilizers:</span>
-                  <span className="text-sm font-medium">{modelInfo.available_fertilizers.length}</span>
+                  <span className="text-sm text-gray-600">Label Encoders:</span>
+                  <span className="text-sm font-medium">
+                    {Object.keys(modelInfo.label_encoders || {}).length}
+                  </span>
                 </div>
               </div>
             </div>
@@ -121,9 +159,12 @@ const MLModelStatus = () => {
             <div className="flex items-start space-x-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-yellow-800">Using Fallback Predictions</p>
+                <p className="text-sm font-medium text-yellow-800">
+                  Using Fallback Predictions
+                </p>
                 <p className="text-xs text-yellow-700 mt-1">
-                  The ML model is unavailable. Predictions are using rule-based algorithms with reduced accuracy.
+                  The ML model is unavailable. Predictions are using rule-based
+                  algorithms with reduced accuracy.
                 </p>
               </div>
             </div>

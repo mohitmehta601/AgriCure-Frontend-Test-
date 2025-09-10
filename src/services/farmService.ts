@@ -1,6 +1,6 @@
 import { supabase, Farm } from './supabaseClient';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://agricure-backend-production-63c7.up.railway.app";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://0.0.0.0:8000";
 
 export type SoilDataResponse = {
   location: { latitude: number; longitude: number; timestamp: string };

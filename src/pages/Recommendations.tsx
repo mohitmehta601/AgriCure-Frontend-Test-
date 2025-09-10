@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import EnhancedFertilizerRecommendations from "@/components/EnhancedFertilizerRecommendations";
+import LLMEnhancedFertilizerRecommendations from "@/components/LLMEnhancedFertilizerRecommendations";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FormData {
@@ -66,16 +67,25 @@ const Recommendations = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
-  const { recommendations, formData } = location.state || {};
+  const { recommendations, formData, llmEnhancedData, isLLMEnhanced } =
+    location.state || {};
 
   const handleBack = () => {
-    navigate('/dashboard', { state: { activeTab: 'recommendations' } });
+    navigate("/dashboard", { state: { activeTab: "recommendations" } });
   };
 
-  if (!recommendations || !formData) {
-    navigate('/dashboard');
+  // Handle case where neither old nor new format data is available
+  if (!recommendations && !llmEnhancedData) {
+    navigate("/dashboard");
     return null;
   }
+
+  // Determine which component to render based on data type
+  const shouldUseLLMComponent =
+    isLLMEnhanced && llmEnhancedData?.llmEnhancedResult;
+  const displayFormData = llmEnhancedData || formData;
+  const farmName =
+    llmEnhancedData?.farm?.name || formData?.fieldName || "Unknown Farm";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -90,17 +100,19 @@ const Recommendations = () => {
               className="flex items-center space-x-2 bg-white hover:bg-gray-50 border border-gray-200 text-black hover:text-black"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span className="whitespace-nowrap">{t('common.back')}</span>
+              <span className="whitespace-nowrap">{t("common.back")}</span>
             </Button>
           </div>
 
-
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-              {t('recommendations.title')}
+              {t("recommendations.title")}
             </h1>
             <p className="text-sm sm:text-base text-gray-600">
-              {t('recommendations.subtitle')} - {formData.fieldName}
+              {shouldUseLLMComponent
+                ? "🤖 AI-Enhanced Recommendations"
+                : t("recommendations.subtitle")}{" "}
+              - {farmName}
             </p>
           </div>
         </div>
@@ -118,18 +130,24 @@ const Recommendations = () => {
             </h2>
           </div>
           <p className="text-sm sm:text-base text-gray-600 text-center max-w-md">
-            ML-Powered Agricultural Solutions for Smart Farming
+            {shouldUseLLMComponent
+              ? "Advanced ML + LLM Powered Agricultural Intelligence"
+              : "ML-Powered Agricultural Solutions for Smart Farming"}
           </p>
         </div>
 
         {/* Recommendations Content */}
-        <EnhancedFertilizerRecommendations
-          recommendations={recommendations}
-          formData={formData}
-        />
+        {shouldUseLLMComponent ? (
+          <LLMEnhancedFertilizerRecommendations data={llmEnhancedData} />
+        ) : (
+          <EnhancedFertilizerRecommendations
+            recommendations={recommendations}
+            formData={displayFormData}
+          />
+        )}
       </div>
     </div>
   );
 };
 
-export default Recommendations; 
+export default Recommendations;

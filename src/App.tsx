@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import Recommendations from "./pages/Recommendations";
 import RecommendationDetails from "./pages/RecommendationDetails";
 import NotFound from "./pages/NotFound";
 import Video from "./pages/Video";
+import { EnhancedMLDemo } from "./components/EnhancedMLDemo";
 
 const queryClient = new QueryClient();
 
@@ -31,8 +31,12 @@ const App = () => (
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/recommendations" element={<Recommendations />} />
-              <Route path="/recommendations/:id" element={<RecommendationDetails />} />
-              <Route path="/video" element={<Video src="video.mp4"/>} />
+              <Route
+                path="/recommendations/:id"
+                element={<RecommendationDetails />}
+              />
+              <Route path="/video" element={<Video src="video.mp4" />} />
+              <Route path="/demo" element={<EnhancedMLDemo />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

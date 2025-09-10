@@ -37,7 +37,7 @@ export interface GeolocationError {
   message: string;
 }
 
-const API_BASE_URL = 'https://agricure-backend-production-63c7.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export class LocationSoilService {
   /**

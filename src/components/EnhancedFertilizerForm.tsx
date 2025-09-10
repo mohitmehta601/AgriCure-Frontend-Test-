@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   mlApiService,
   FertilizerPredictionInput,
+  EnhancedFertilizerInput,
 } from "@/services/mlApiService";
 import {
   Sparkles,
@@ -58,6 +59,7 @@ interface FormData {
   humidity: string;
   soilMoisture: string;
   mlPrediction?: string;
+  llmEnhancedResult?: any; // LLM enhanced prediction result
 }
 
 interface EnhancedFertilizerFormProps {
@@ -305,7 +307,8 @@ const EnhancedFertilizerForm = ({
     setIsLoading(true);
 
     try {
-      const mlInput: FertilizerPredictionInput = {
+      // Use enhanced input for LLM-powered recommendations
+      const enhancedMLInput = {
         Temperature: parseFloat(formData.temperature),
         Humidity: parseFloat(formData.humidity),
         Moisture: parseFloat(formData.soilMoisture),
@@ -314,9 +317,17 @@ const EnhancedFertilizerForm = ({
         Nitrogen: parseFloat(formData.nitrogen),
         Potassium: parseFloat(formData.potassium),
         Phosphorous: parseFloat(formData.phosphorus),
+        pH: parseFloat(formData.soilPH) || 6.5,
+        // Enhanced fields for LLM
+        Sowing_Date:
+          selectedFarm.sowing_date || new Date().toISOString().split("T")[0],
+        Field_Size: selectedFarm.size,
+        Field_Unit: selectedFarm.unit,
+        Bulk_Density_g_cm3: 1.3, // Default bulk density
+        Sampling_Depth_cm: 15.0, // Default sampling depth
       };
 
-      const validation = mlApiService.validateInput(mlInput);
+      const validation = mlApiService.validateEnhancedInput(enhancedMLInput);
       if (!validation.isValid) {
         toast({
           title: "Validation Error",
@@ -327,20 +338,65 @@ const EnhancedFertilizerForm = ({
         return;
       }
 
-      const prediction = await mlApiService.getPrediction(mlInput);
+      // Try LLM-enhanced prediction first, fallback to basic if needed
+      try {
+        const llmPrediction = await mlApiService.getLLMEnhancedPrediction(
+          enhancedMLInput
+        );
 
-      const enhancedData = {
-        ...formData,
-        mlPrediction: prediction.fertilizer,
-        farm: selectedFarm,
-      };
+        const enhancedData = {
+          ...formData,
+          mlPrediction:
+            llmPrediction.ml_model_prediction?.name ||
+            llmPrediction.primary_fertilizer?.name ||
+            "Unknown",
+          llmEnhancedResult: llmPrediction,
+          farm: selectedFarm,
+        };
 
-      onSubmit(enhancedData);
+        onSubmit(enhancedData);
 
-      toast({
-        title: "AI Analysis Complete!",
-        description: `Recommended fertilizer: ${prediction.fertilizer}`,
-      });
+        toast({
+          title: "🧠 AI Analysis Complete!",
+          description: `Enhanced recommendations with cost analysis generated for ${
+            llmPrediction.primary_fertilizer?.name || "fertilizer"
+          }`,
+        });
+      } catch (llmError) {
+        console.warn(
+          "LLM prediction failed, falling back to basic prediction:",
+          llmError
+        );
+
+        // Fallback to basic prediction
+        const basicMLInput = {
+          Temperature: parseFloat(formData.temperature),
+          Humidity: parseFloat(formData.humidity),
+          Moisture: parseFloat(formData.soilMoisture),
+          Soil_Type: selectedFarm.soil_type,
+          Crop_Type: selectedFarm.crop_type,
+          Nitrogen: parseFloat(formData.nitrogen),
+          Potassium: parseFloat(formData.potassium),
+          Phosphorous: parseFloat(formData.phosphorus),
+          pH: parseFloat(formData.soilPH) || 6.5,
+        };
+
+        const prediction = await mlApiService.getPrediction(basicMLInput);
+
+        const enhancedData = {
+          ...formData,
+          mlPrediction: prediction.fertilizer,
+          farm: selectedFarm,
+        };
+
+        onSubmit(enhancedData);
+
+        toast({
+          title: "AI Analysis Complete!",
+          description: `Basic recommendation: ${prediction.fertilizer} (Enhanced features unavailable)`,
+          variant: "default",
+        });
+      }
     } catch (error) {
       console.error("ML prediction failed:", error);
       toast({

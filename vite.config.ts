@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     proxy: {
       '/api': { 
-        target: process.env.VITE_API_URL || 'https://agricure-backend-production-63c7.up.railway.app', 
+        target: process.env.VITE_API_URL || 'http://0.0.0.0:8000', 
         changeOrigin: true 
       }
     }
