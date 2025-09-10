@@ -7,35 +7,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
-    flowType: 'pkce'
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'agricure-web-app'
-    }
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10
-    }
-  }
-});
-
-// Add network status monitoring
-export const checkSupabaseConnection = async (): Promise<boolean> => {
-  try {
-    const { data, error } = await supabase.from('products').select('id').limit(1);
-    return !error;
-  } catch (error) {
-    console.error('Supabase connection check failed:', error);
-    return false;
-  }
-};
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Types for our database tables
 export interface UserProfile {
@@ -44,7 +16,6 @@ export interface UserProfile {
   email: string;
   farm_location?: string;
   phone_number?: string;
-  product_id?: string;
   farm_size?: number;
   farm_size_unit?: string;
   created_at: string;

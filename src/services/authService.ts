@@ -5,189 +5,64 @@ export interface SignUpData {
   password: string;
   fullName: string;
   productId: string;
-  mobileNumber: string;
+  farmLocation?: string;
 }
 
 export interface SignInData {
-  emailOrPhone: string;
-  password: string;
-}
-
-export interface TempUserData {
-  productId: string;
-  fullName: string;
-  mobileNumber: string;
   email: string;
   password: string;
 }
+
 export const authService = {
-  // Validate product ID
-  async validateProductId(productId: string) {
+  // Sign up new user
+  async signUp(data: SignUpData) {
     try {
-      const { data, error } = await supabase
+      // First, validate the product ID
+      const { data: productData, error: productError } = await supabase
         .from('products')
         .select('id')
-        .eq('id', productId)
+        .eq('id', data.productId)
         .eq('is_active', true)
         .single();
 
-      return { isValid: !!data && !error, error };
-    } catch (error) {
-      return { isValid: false, error };
-    }
-  },
-
-  // Store temporary user data (before verification)
-  async storeTempUserData(data: TempUserData) {
-    try {
-      // Store in localStorage temporarily
-      localStorage.setItem('tempUserData', JSON.stringify(data));
-      return { success: true, error: null };
-    } catch (error) {
-      return { success: false, error };
-    }
-  },
-
-  // Get temporary user data
-  getTempUserData(): TempUserData | null {
-    try {
-      const data = localStorage.getItem('tempUserData');
-      return data ? JSON.parse(data) : null;
-    } catch (error) {
-      return null;
-    }
-  },
-
-  // Clear temporary user data
-  clearTempUserData() {
-    localStorage.removeItem('tempUserData');
-  },
-
-  // Complete signup after OTP verification (user already created via OTP)
-  async completeSignupAfterOTP(data: SignUpData, userId: string) {
-    try {
-      console.log('Completing signup for user:', userId);
-      
-      // Wait a moment for the trigger to complete
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // Check if profile was created by trigger, if not create manually
-      const { data: existingProfile } = await supabase
-        .from('user_profiles')
-        .select('id')
-        .eq('id', userId)
-        .single();
-      
-      if (!existingProfile) {
-        console.log('Profile not found, creating manually...');
-        
-        // Create profile manually if trigger failed
-        const { error: profileError } = await supabase
-          .from('user_profiles')
-          .insert({
-            id: userId,
-            full_name: data.fullName,
-            email: data.email,
-            phone_number: data.mobileNumber.startsWith('+') ? data.mobileNumber : `+91${data.mobileNumber}`,
-            product_id: data.productId,
-            product_id: data.productId,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
-        
-        if (profileError) {
-          console.error('Manual profile creation failed:', profileError);
-          // Don't throw error, user is already created in auth
-        } else {
-          console.log('Profile created manually');
-        }
-      } else {
-        console.log('Profile already exists from trigger');
+      if (productError || !productData) {
+        throw new Error('Invalid Product ID. Please enter a valid Product ID.');
       }
 
-      // Get the current user data to return
-      const { data: userData, error: getUserError } = await supabase.auth.getUser();
-      
-      console.log('Signup completion successful');
-      return { data: userData, error: getUserError };
-    } catch (error) {
-      console.error('Complete signup error:', error.message || error);
-      return { data: null, error };
-    }
-  },
-
-  // Update user profile after signup
-  async updateUserProfileAfterSignup(data: SignUpData, userId: string) {
-    try {
-      const { data: updateData, error: profileError } = await supabase
-        .from('user_profiles')
-        .upsert({
-          id: userId,
-          full_name: data.fullName,
-          email: data.email,
-          phone_number: data.mobileNumber.startsWith('+') ? data.mobileNumber : `+91${data.mobileNumber}`,
-        }, {
-          onConflict: 'id'
-        });
-
-      if (profileError) throw profileError;
-
-      return { data: updateData, error: null };
-    } catch (error) {
-      return { data: null, error };
-    }
-  },
-
-  // Traditional signup with email/password (fallback)
-  async signUp(data: SignUpData) {
-    try {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
-        options: {
-          data: {
-            full_name: data.fullName,
-            product_id: data.productId,
-            phone_number: data.mobileNumber.startsWith('+') ? data.mobileNumber : `+91${data.mobileNumber}`,
-          }
-        }
       });
 
       if (authError) throw authError;
+
+      if (authData.user) {
+        // Create user profile
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: authData.user.id,
+            full_name: data.fullName,
+            email: data.email,
+            farm_location: data.farmLocation,
+          });
+
+        if (profileError) throw profileError;
+      }
 
       return { data: authData, error: null };
     } catch (error) {
       return { data: null, error };
     }
   },
+
   // Sign in user
   async signIn(data: SignInData) {
     try {
-      console.log('Attempting sign in for:', data.emailOrPhone);
-      
-      // Determine if input is email or phone
-      const isEmail = data.emailOrPhone.includes('@');
-      
-      let signInPayload;
-      
-      if (isEmail) {
-        signInPayload = { 
-          email: data.emailOrPhone, 
-          password: data.password 
-        };
-      } else {
-        // Format phone number for authentication
-        const formattedPhone = data.emailOrPhone.startsWith('+') 
-          ? data.emailOrPhone 
-          : `+91${data.emailOrPhone}`;
-        signInPayload = { 
-          phone: formattedPhone, 
-          password: data.password 
-        };
-      }
-
-      console.log('Sign in payload prepared:', { isEmail, hasPassword: !!data.password });
-      const { data: authData, error } = await supabase.auth.signInWithPassword(signInPayload);
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
 
       return { data: authData, error };
     } catch (error) {

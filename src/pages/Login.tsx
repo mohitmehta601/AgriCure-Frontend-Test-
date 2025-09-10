@@ -11,77 +11,19 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Login = () => {
-  const [emailOrPhone, setEmailOrPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
 
-  const validateInput = () => {
-    if (!emailOrPhone.trim()) {
-      toast({
-        title: t('common.error'),
-        description: "Please enter your email or mobile number",
-        variant: "destructive"
-      });
-      return false;
-    }
-    
-    if (!password) {
-      toast({
-        title: t('common.error'),
-        description: "Please enter your password",
-        variant: "destructive"
-      });
-      return false;
-    }
-    
-    // Validate email format if it contains @
-    if (emailOrPhone.includes('@')) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(emailOrPhone)) {
-        toast({
-          title: t('common.error'),
-          description: "Please enter a valid email address",
-          variant: "destructive"
-        });
-        return false;
-      }
-    } else {
-      // Validate mobile number format (should be 10 digits)
-      const phoneRegex = /^\d{10}$/;
-      if (!phoneRegex.test(emailOrPhone)) {
-        toast({
-          title: t('common.error'),
-          description: "Please enter a valid 10-digit mobile number",
-          variant: "destructive"
-        });
-        return false;
-      }
-    }
-    
-    return true;
-  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateInput()) {
-      return;
-    }
-    
     setIsLoading(true);
 
     try {
-      // Format the input properly
-      const formattedInput = emailOrPhone.includes('@') 
-        ? emailOrPhone 
-        : (emailOrPhone.startsWith('+') ? emailOrPhone : `+91${emailOrPhone}`);
-        
-      const { data, error } = await authService.signIn({ 
-        emailOrPhone: formattedInput, 
-        password 
-      });
+      const { data, error } = await authService.signIn({ email, password });
       
       if (error) {
         throw error;
@@ -90,7 +32,7 @@ const Login = () => {
       if (data.user) {
         toast({
           title: t('auth.loginSuccess'),
-          description: `Welcome back!`,
+          description: t('auth.welcomeBack'),
         });
         navigate("/dashboard");
       }
@@ -98,7 +40,7 @@ const Login = () => {
       console.error('Login error:', error);
       toast({
         title: t('auth.loginFailed'),
-        description: error.message || 'Invalid credentials. Please check your email/mobile and password.',
+        description: error.message || t('auth.invalidCredentials'),
         variant: "destructive"
       });
     } finally {
@@ -106,15 +48,6 @@ const Login = () => {
     }
   };
 
-  const getInputPlaceholder = () => {
-    return emailOrPhone.includes('@') || emailOrPhone.length === 0 
-      ? "Enter email or mobile number" 
-      : "Enter 10-digit mobile number";
-  };
-
-  const getInputType = () => {
-    return emailOrPhone.includes('@') ? "email" : "tel";
-  };
   const handleBack = () => {
     navigate("/");
   };
@@ -155,28 +88,16 @@ const Login = () => {
           <CardContent className="px-4 md:px-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="emailOrPhone" className="text-sm md:text-base">
-                  Email or Mobile Number *
-                </Label>
+                <Label htmlFor="email" className="text-sm md:text-base">{t('auth.email')}</Label>
                 <Input
-                  id="emailOrPhone"
-                  type={getInputType()}
-                  placeholder={getInputPlaceholder()}
-                  value={emailOrPhone}
-                  onChange={(e) => {
-                    let value = e.target.value;
-                    // If it's not an email (no @), format as mobile number
-                    if (!value.includes('@')) {
-                      value = value.replace(/\D/g, '').slice(0, 10);
-                    }
-                    setEmailOrPhone(value);
-                  }}
+                  id="email"
+                  type="email"
+                  placeholder="farmer@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   className="mt-1"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  You can use either your email address or 10-digit mobile number
-                </p>
               </div>
               <div>
                 <Label htmlFor="password" className="text-sm md:text-base">{t('auth.password')}</Label>
