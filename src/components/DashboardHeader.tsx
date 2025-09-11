@@ -11,7 +11,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import ProfileModal from "./ProfileModal";
-import { authService } from "@/services/authService";
+import { AuthApiService } from "@/services/authApi";
 import { UserProfile } from "@/services/supabaseClient";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -31,7 +31,7 @@ const DashboardHeader = ({ user, userProfile, onProfileUpdate }: DashboardHeader
 
   const handleLogout = async () => {
     try {
-      await authService.signOut();
+      await AuthApiService.signOut();
       toast({
         title: t('common.success'),
         description: "You have been successfully logged out.",

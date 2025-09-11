@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { RealTimeDataProvider } from "@/contexts/RealTimeDataContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import PublicRoute from "@/components/auth/PublicRoute";
+import Auth from "@/pages/Auth";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -26,15 +29,54 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/recommendations" element={<Recommendations />} />
-              <Route
-                path="/recommendations/:id"
-                element={<RecommendationDetails />}
-              />
+              <Route path="/" element={
+                <PublicRoute>
+                  <Index />
+                </PublicRoute>
+              } />
+              
+              {/* New Supabase Auth Routes */}
+              <Route path="/auth/:step" element={
+                <PublicRoute>
+                  <Auth />
+                </PublicRoute>
+              } />
+              <Route path="/auth" element={
+                <PublicRoute>
+                  <Auth />
+                </PublicRoute>
+              } />
+              
+              {/* Legacy auth routes - redirect to new auth */}
+              <Route path="/login" element={
+                <PublicRoute>
+                  <Auth />
+                </PublicRoute>
+              } />
+              <Route path="/signup" element={
+                <PublicRoute>
+                  <Auth />
+                </PublicRoute>
+              } />
+              
+              {/* Protected Routes */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/recommendations" element={
+                <ProtectedRoute>
+                  <Recommendations />
+                </ProtectedRoute>
+              } />
+              <Route path="/recommendations/:id" element={
+                <ProtectedRoute>
+                  <RecommendationDetails />
+                </ProtectedRoute>
+              } />
+              
+              {/* Public Routes */}
               <Route path="/video" element={<Video src="video.mp4" />} />
               <Route path="/demo" element={<EnhancedMLDemo />} />
               <Route path="*" element={<NotFound />} />

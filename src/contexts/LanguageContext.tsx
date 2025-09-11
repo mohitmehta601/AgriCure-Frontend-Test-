@@ -196,6 +196,18 @@ const translations = {
     'auth.signupHere': 'Sign up here',
     'auth.alreadyHaveAccount': 'Already have an account?',
     'auth.signInHere': 'Sign in here',
+    'auth.productId': 'Product ID',
+    'auth.mobileNumber': 'Mobile Number',
+    'auth.chooseVerification': 'Choose Verification Method',
+    'auth.verifyByEmail': 'Verify by Email',
+    'auth.verifyBySMS': 'Verify by SMS',
+    'auth.verificationCodeSent': 'Verification Code Sent',
+    'auth.enterVerificationCode': 'Enter the 6-digit verification code',
+    'auth.verifyCode': 'Verify Code',
+    'auth.resendCode': 'Resend Code',
+    'auth.accountNotVerified': 'Account Not Verified',
+    'auth.verificationSuccessful': 'Verification Successful',
+    'auth.maxAttemptsReached': 'Maximum attempts reached',
     
     // Hero Section
     'hero.title': 'Smart Farming for',

@@ -18,7 +18,7 @@ const Hero = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
             <Button asChild size="lg" className="bg-grass-600 hover:bg-grass-700 text-base md:text-lg px-6 md:px-8 py-4 md:py-6">
-              <Link to="/signup">{t('hero.startTrial')}</Link>
+              <Link to="/auth/signup">{t('hero.startTrial')}</Link>
             </Button>
             <Button asChild size="lg" className="bg-grass-600 hover:bg-grass-700 text-base md:text-lg px-6 md:px-8 py-4 md:py-6">
               <Link to="/video">{t('hero.viewDemo')}</Link>

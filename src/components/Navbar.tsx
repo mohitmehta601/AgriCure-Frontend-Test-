@@ -53,19 +53,19 @@ const Navbar = () => {
           <div className="hidden sm:flex items-center space-x-4">
             <LanguageSwitcher />
             <Button asChild variant="ghost">
-              <Link to="/login">{t('nav.login')}</Link>
+              <Link to="/auth/login">{t('nav.login')}</Link>
             </Button>
             <Button asChild className="bg-grass-600 hover:bg-grass-700">
-              <Link to="/signup">{t('nav.signup')}</Link>
+              <Link to="/auth/signup">{t('nav.signup')}</Link>
             </Button>
           </div>
 
           <div className="flex sm:hidden items-center space-x-2">
             <Button asChild variant="ghost" size="sm">
-              <Link to="/login">{t('nav.login')}</Link>
+              <Link to="/auth/login">{t('nav.login')}</Link>
             </Button>
             <Button asChild size="sm" className="bg-grass-600 hover:bg-grass-700">
-              <Link to="/signup">{t('nav.start')}</Link>
+              <Link to="/auth/signup">{t('nav.start')}</Link>
             </Button>
           </div>
 

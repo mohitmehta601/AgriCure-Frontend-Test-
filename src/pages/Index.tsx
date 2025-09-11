@@ -30,10 +30,10 @@ const Index = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="bg-white text-grass-600 hover:bg-gray-100 text-sm md:text-base px-6 md:px-8 py-3 md:py-4">
-              <Link to="/signup">{t('cta.getStarted')}</Link>
+              <Link to="/auth/signup">{t('cta.getStarted')}</Link>
             </Button>
             <Button asChild size="lg" className="bg-white text-grass-600 hover:bg-gray-100 text-sm md:text-base px-6 md:px-8 py-3 md:py-4">
-              <Link to="/login">{t('cta.alreadyMember')}</Link>
+              <Link to="/auth/login">{t('cta.alreadyMember')}</Link>
             </Button>
           </div>
         </div>

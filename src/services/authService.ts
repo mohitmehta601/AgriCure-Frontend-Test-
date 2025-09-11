@@ -1,3 +1,6 @@
+// Legacy auth service - keeping for backward compatibility
+// New auth flows should use AuthApiService from authApi.ts
+
 import { supabase, UserProfile } from './supabaseClient';
 
 export interface SignUpData {
