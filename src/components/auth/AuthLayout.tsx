@@ -42,58 +42,101 @@ export default function AuthLayout({ initialStep = 'signup' }: AuthLayoutProps) 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-grass-50 to-green-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center space-x-2">
-            <img src="/logo.png" alt="AgriCure Logo" className="h-10 w-10" />
-            <span className="text-3xl font-bold text-grass-800">AgriCure</span>
+    <div className="min-h-screen bg-gradient-to-br from-grass-50 via-green-50 to-blue-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md lg:max-w-lg">
+        {/* Logo Header */}
+        <div className="text-center mb-6 md:mb-8">
+          <Link 
+            to="/" 
+            className="inline-flex items-center space-x-3 group transition-all duration-300 hover:scale-105"
+          >
+            <div className="p-2 bg-white rounded-full shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+              <img src="/logo.png" alt="AgriCure Logo" className="h-8 w-8 md:h-10 md:w-10" />
+            </div>
+            <div className="text-left">
+              <span className="text-2xl md:text-3xl font-bold text-grass-800 block">AgriCure</span>
+              <span className="text-xs md:text-sm text-gray-600">Smart Farming Solutions</span>
+            </div>
           </Link>
-          <p className="text-gray-600 mt-2">Smart Farming Solutions</p>
         </div>
 
         {/* Auth Steps */}
-        {currentStep === 'signup' && (
-          <div>
-            <Signup onVerificationNeeded={handleVerificationNeeded} />
-            <div className="mt-4 text-center">
-              <Button
-                variant="ghost"
-                onClick={() => setCurrentStep('login')}
-                className="text-grass-600 hover:text-grass-700"
-              >
-                Already have an account? Sign in
-              </Button>
+        <div className="relative">
+          {/* Step Indicator */}
+          <div className="flex justify-center mb-6">
+            <div className="flex items-center space-x-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
+              <div className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                currentStep === 'signup' ? 'bg-grass-600' : 'bg-gray-300'
+              }`} />
+              <div className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                currentStep === 'otp' ? 'bg-grass-600' : 'bg-gray-300'
+              }`} />
+              <div className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                currentStep === 'login' ? 'bg-grass-600' : 'bg-gray-300'
+              }`} />
             </div>
           </div>
-        )}
 
-        {currentStep === 'login' && (
-          <div>
-            <Login onVerificationNeeded={handleVerificationNeeded} />
-            <div className="mt-4 text-center">
-              <Button
-                variant="ghost"
-                onClick={() => setCurrentStep('signup')}
-                className="text-grass-600 hover:text-grass-700"
-              >
-                Don't have an account? Sign up
-              </Button>
-            </div>
+          {/* Content */}
+          <div className="transition-all duration-300">
+            {currentStep === 'signup' && (
+              <div className="animate-in slide-in-from-right-5 duration-300">
+                <Signup onVerificationNeeded={handleVerificationNeeded} />
+                <div className="mt-6 text-center">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setCurrentStep('login')}
+                    className="text-grass-600 hover:text-grass-700 font-medium transition-colors"
+                  >
+                    Already have an account? Sign in
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 'login' && (
+              <div className="animate-in slide-in-from-left-5 duration-300">
+                <Login onVerificationNeeded={handleVerificationNeeded} />
+                <div className="mt-6 text-center">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setCurrentStep('signup')}
+                    className="text-grass-600 hover:text-grass-700 font-medium transition-colors"
+                  >
+                    Don't have an account? Sign up
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 'otp' && verificationData && (
+              <div className="animate-in slide-in-from-bottom-5 duration-300">
+                <OtpVerify
+                  type={verificationData.type}
+                  email={verificationData.email}
+                  phone={verificationData.phone}
+                  userData={verificationData.userData}
+                  onBack={verificationData.userData?.identifier ? handleBackToLogin : handleBackToSignup}
+                  onSuccess={handleVerificationSuccess}
+                />
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
-        {currentStep === 'otp' && verificationData && (
-          <OtpVerify
-            type={verificationData.type}
-            email={verificationData.email}
-            phone={verificationData.phone}
-            userData={verificationData.userData}
-            onBack={verificationData.userData?.identifier ? handleBackToLogin : handleBackToSignup}
-            onSuccess={handleVerificationSuccess}
-          />
-        )}
+        {/* Footer */}
+        <div className="text-center mt-8 text-xs md:text-sm text-gray-500">
+          <p>
+            By continuing, you agree to our{' '}
+            <Link to="/terms" className="text-grass-600 hover:text-grass-700 underline">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link to="/privacy" className="text-grass-600 hover:text-grass-700 underline">
+              Privacy Policy
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

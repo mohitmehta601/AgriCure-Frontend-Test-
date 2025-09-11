@@ -165,6 +165,67 @@
   }
 }
 
+/* Auth-specific animations */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out;
 }
@@ -195,6 +256,13 @@
   animation: glow 2s ease-in-out infinite;
 }
 
+.animate-pulse-ring {
+  animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
 /* Smooth transitions for interactive elements */
 .transition-all {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -204,6 +272,18 @@
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
+/* Auth form specific styles */
+.auth-input-focus {
+  @apply focus:ring-2 focus:ring-grass-500 focus:border-grass-500 transition-all duration-200;
+}
+
+.auth-button-primary {
+  @apply bg-grass-600 hover:bg-grass-700 active:bg-grass-800 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200;
+}
+
+.auth-card {
+  @apply bg-white/95 backdrop-blur-sm shadow-xl border-0 rounded-2xl;
+}
 /* Enhanced hover effects */
 .hover-lift:hover {
   transform: translateY(-4px);
@@ -218,11 +298,39 @@
   box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
 }
 
+/* OTP Input specific styles */
+.otp-input {
+  @apply text-center font-mono tracking-wider;
+}
+
+.otp-input:focus {
+  @apply ring-2 ring-grass-500 border-grass-500 bg-grass-50;
+}
+
+.otp-input.error {
+  @apply border-red-500 bg-red-50 ring-red-500;
+}
+
+.otp-input.filled {
+  @apply border-grass-500 bg-grass-50 text-grass-700;
+}
 /* Responsive improvements */
 @media (max-width: 640px) {
   .container {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+  
+  .auth-form {
+    @apply space-y-4;
+  }
+  
+  .auth-input {
+    @apply h-11 text-sm;
+  }
+  
+  .auth-button {
+    @apply h-12 text-sm;
   }
 }
 
@@ -230,6 +338,24 @@
   .text-responsive {
     font-size: 0.875rem;
     line-height: 1.25rem;
+  }
+  
+  .auth-card-mobile {
+    @apply mx-4 rounded-xl;
+  }
+}
+
+@media (min-width: 769px) {
+  .auth-input {
+    @apply h-12 text-base;
+  }
+  
+  .auth-button {
+    @apply h-14 text-base;
+  }
+  
+  .auth-form {
+    @apply space-y-5;
   }
 }
 
