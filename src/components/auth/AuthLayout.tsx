@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import Signup from './Signup';
 import Login from './Login';
 import OtpVerify from './OtpVerify';
