@@ -14,6 +14,7 @@ import RecommendationDetails from "./pages/RecommendationDetails";
 import NotFound from "./pages/NotFound";
 import Video from "./pages/Video";
 import { EnhancedMLDemo } from "./components/EnhancedMLDemo";
+import IntegrationTestDashboard from "./components/IntegrationTestDashboard";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,10 @@ const App = () => (
               />
               <Route path="/video" element={<Video src="video.mp4" />} />
               <Route path="/demo" element={<EnhancedMLDemo />} />
+              <Route
+                path="/integration-test"
+                element={<IntegrationTestDashboard />}
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
