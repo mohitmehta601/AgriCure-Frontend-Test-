@@ -8,14 +8,28 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, Clock, Play, RefreshCw, Server, Brain, TestTube, Leaf, MapPin, Wifi, AlertCircle, Loader2 } from "lucide-react";
-import { integratedMLService } from '@/services/integratedMLService';
-import { mlApiService } from '@/services/mlApiService';
-import { LocationSoilService } from '@/services/locationSoilService';
+import {
+  CheckCircle,
+  XCircle,
+  Clock,
+  Play,
+  RefreshCw,
+  Server,
+  Brain,
+  TestTube,
+  Leaf,
+  MapPin,
+  Wifi,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
+import { integratedMLService } from "@/services/integratedMLService";
+import { mlApiService } from "@/services/mlApiService";
+import { LocationSoilService } from "@/services/locationSoilService";
 
 interface TestResult {
   name: string;
-  status: 'pending' | 'success' | 'failed' | 'warning';
+  status: "pending" | "success" | "failed" | "warning";
   message: string;
   details?: any;
   duration?: number;
@@ -24,30 +38,64 @@ interface TestResult {
 const IntegrationTestDashboard: React.FC = () => {
   const [tests, setTests] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
-  const [overallStatus, setOverallStatus] = useState<'idle' | 'testing' | 'success' | 'failed'>('idle');
+  const [overallStatus, setOverallStatus] = useState<
+    "idle" | "testing" | "success" | "failed"
+  >("idle");
   const [backendUrl, setBackendUrl] = useState("");
 
   const initialTests: TestResult[] = [
-    { name: 'Backend Health Check', status: 'pending', message: 'Checking if backend is accessible...' },
-    { name: 'ML Model Status', status: 'pending', message: 'Verifying ML model availability...' },
-    { name: 'Basic Prediction Test', status: 'pending', message: 'Testing basic fertilizer prediction...' },
-    { name: 'Enhanced Prediction Test', status: 'pending', message: 'Testing enhanced prediction with all outputs...' },
-    { name: 'LLM Enhanced Test', status: 'pending', message: 'Testing LLM-enhanced recommendations...' },
-    { name: 'Location Services Test', status: 'pending', message: 'Testing location-based features...' },
-    { name: 'Soil Data Integration', status: 'pending', message: 'Testing soil data API integration...' },
-    { name: 'Complete Integration Test', status: 'pending', message: 'Testing end-to-end workflow...' }
+    {
+      name: "Backend Health Check",
+      status: "pending",
+      message: "Checking if backend is accessible...",
+    },
+    {
+      name: "ML Model Status",
+      status: "pending",
+      message: "Verifying ML model availability...",
+    },
+    {
+      name: "Basic Prediction Test",
+      status: "pending",
+      message: "Testing basic fertilizer prediction...",
+    },
+    {
+      name: "Enhanced Prediction Test",
+      status: "pending",
+      message: "Testing enhanced prediction with all outputs...",
+    },
+    {
+      name: "LLM Enhanced Test",
+      status: "pending",
+      message: "Testing LLM-enhanced recommendations...",
+    },
+    {
+      name: "Location Services Test",
+      status: "pending",
+      message: "Testing location-based features...",
+    },
+    {
+      name: "Soil Data Integration",
+      status: "pending",
+      message: "Testing soil data API integration...",
+    },
+    {
+      name: "Complete Integration Test",
+      status: "pending",
+      message: "Testing end-to-end workflow...",
+    },
   ];
 
   useEffect(() => {
-    setBackendUrl(import.meta.env.VITE_API_URL || 'http://localhost:8000');
+    setBackendUrl(import.meta.env.VITE_API_URL || "http://localhost:8000");
     setTests(initialTests);
     checkConnection();
   }, []);
 
   const updateTest = (index: number, update: Partial<TestResult>) => {
-    setTests(prev => prev.map((test, i) => 
-      i === index ? { ...test, ...update } : test
-    ));
+    setTests((prev) =>
+      prev.map((test, i) => (i === index ? { ...test, ...update } : test))
+    );
   };
 
   const checkConnection = async () => {
@@ -55,13 +103,13 @@ const IntegrationTestDashboard: React.FC = () => {
       const healthCheck = await integratedMLService.testBackendConnection();
       // This will be used to show connection status
     } catch (error) {
-      console.error('Connection check failed:', error);
+      console.error("Connection check failed:", error);
     }
   };
 
   const runTests = async () => {
     setIsRunning(true);
-    setOverallStatus('testing');
+    setOverallStatus("testing");
     setTests(initialTests);
 
     let successCount = 0;
@@ -72,28 +120,28 @@ const IntegrationTestDashboard: React.FC = () => {
       const startTime = Date.now();
       const healthCheck = await integratedMLService.testBackendConnection();
       const duration = Date.now() - startTime;
-      
+
       if (healthCheck.connected) {
         updateTest(0, {
-          status: 'success',
+          status: "success",
           message: `Backend is running (${healthCheck.response_time}ms)`,
           details: healthCheck,
-          duration
+          duration,
         });
         successCount++;
       } else {
         updateTest(0, {
-          status: 'failed',
-          message: 'Backend is not accessible',
+          status: "failed",
+          message: "Backend is not accessible",
           details: healthCheck,
-          duration
+          duration,
         });
       }
     } catch (error: any) {
       updateTest(0, {
-        status: 'failed',
+        status: "failed",
         message: `Health check failed: ${error.message}`,
-        duration: Date.now()
+        duration: Date.now(),
       });
     }
 
@@ -102,27 +150,27 @@ const IntegrationTestDashboard: React.FC = () => {
       const startTime = Date.now();
       const healthCheck = await mlApiService.healthCheck();
       const duration = Date.now() - startTime;
-      
+
       if (healthCheck.model_loaded) {
         updateTest(1, {
-          status: 'success',
+          status: "success",
           message: `ML model loaded: ${healthCheck.model_type}`,
           details: healthCheck,
-          duration
+          duration,
         });
         successCount++;
       } else {
         updateTest(1, {
-          status: 'warning',
-          message: 'Backend running but ML model not loaded',
+          status: "warning",
+          message: "Backend running but ML model not loaded",
           details: healthCheck,
-          duration
+          duration,
         });
       }
     } catch (error: any) {
       updateTest(1, {
-        status: 'failed',
-        message: `Model check failed: ${error.message}`
+        status: "failed",
+        message: `Model check failed: ${error.message}`,
       });
     }
 
@@ -133,28 +181,30 @@ const IntegrationTestDashboard: React.FC = () => {
         Temperature: 25,
         Humidity: 80,
         Moisture: 40,
-        Soil_Type: 'Loamy',
-        Crop_Type: 'Rice',
+        Soil_Type: "Loamy",
+        Crop_Type: "Rice",
         Nitrogen: 85,
         Potassium: 45,
         Phosphorous: 35,
-        pH: 6.5
+        pH: 6.5,
       };
 
       const prediction = await mlApiService.getPrediction(testInput);
       const duration = Date.now() - startTime;
 
       updateTest(2, {
-        status: 'success',
-        message: `Predicted: ${prediction.fertilizer} (${prediction.confidence.toFixed(1)}% confidence)`,
+        status: "success",
+        message: `Predicted: ${
+          prediction.fertilizer
+        } (${prediction.confidence.toFixed(1)}% confidence)`,
         details: prediction,
-        duration
+        duration,
       });
       successCount++;
     } catch (error: any) {
       updateTest(2, {
-        status: 'failed',
-        message: `Prediction failed: ${error.message}`
+        status: "failed",
+        message: `Prediction failed: ${error.message}`,
       });
     }
 
@@ -165,31 +215,36 @@ const IntegrationTestDashboard: React.FC = () => {
         Temperature: 25,
         Humidity: 80,
         Moisture: 40,
-        Soil_Type: 'Loamy',
-        Crop_Type: 'Rice',
+        Soil_Type: "Loamy",
+        Crop_Type: "Rice",
         Nitrogen: 85,
         Potassium: 45,
         Phosphorous: 35,
-        pH: 6.5
+        pH: 6.5,
       };
 
-      const enhancedPrediction = await mlApiService.getEnhancedPrediction(testInput);
+      const enhancedPrediction = await mlApiService.getEnhancedPrediction(
+        testInput
+      );
       const duration = Date.now() - startTime;
 
-      const primaryFertilizer = enhancedPrediction.predictions.Primary_Fertilizer;
+      const primaryFertilizer =
+        enhancedPrediction.predictions.Primary_Fertilizer;
       const confidence = enhancedPrediction.confidences.Primary_Fertilizer;
 
       updateTest(3, {
-        status: 'success',
-        message: `Enhanced: ${primaryFertilizer} (${(confidence * 100).toFixed(1)}% confidence)`,
+        status: "success",
+        message: `Enhanced: ${primaryFertilizer} (${(confidence * 100).toFixed(
+          1
+        )}% confidence)`,
         details: enhancedPrediction,
-        duration
+        duration,
       });
       successCount++;
     } catch (error: any) {
       updateTest(3, {
-        status: 'failed',
-        message: `Enhanced prediction failed: ${error.message}`
+        status: "failed",
+        message: `Enhanced prediction failed: ${error.message}`,
       });
     }
 
@@ -200,60 +255,60 @@ const IntegrationTestDashboard: React.FC = () => {
         Temperature: 25,
         Humidity: 80,
         Moisture: 40,
-        Soil_Type: 'Loamy',
-        Crop_Type: 'Rice',
+        Soil_Type: "Loamy",
+        Crop_Type: "Rice",
         Nitrogen: 85,
         Potassium: 45,
         Phosphorous: 35,
         pH: 6.5,
-        Sowing_Date: '2024-01-15',
+        Sowing_Date: "2024-01-15",
         Field_Size: 1.0,
-        Field_Unit: 'hectares',
+        Field_Unit: "hectares",
         Bulk_Density_g_cm3: 1.3,
-        Sampling_Depth_cm: 15.0
+        Sampling_Depth_cm: 15.0,
       };
 
       const llmResult = await mlApiService.getLLMEnhancedPrediction(testInput);
       const duration = Date.now() - startTime;
 
-      const primaryFertilizer = llmResult.primary_fertilizer?.name || 'Unknown';
-      const totalCost = llmResult.cost_estimate?.total || '₹0';
+      const primaryFertilizer = llmResult.primary_fertilizer?.name || "Unknown";
+      const totalCost = llmResult.cost_estimate?.total || "₹0";
 
       updateTest(4, {
-        status: 'success',
+        status: "success",
         message: `LLM Enhanced: ${primaryFertilizer}, Cost: ${totalCost}`,
         details: llmResult,
-        duration
+        duration,
       });
       successCount++;
     } catch (error: any) {
       updateTest(4, {
-        status: 'warning',
-        message: `LLM enhancement not available: ${error.message}`
+        status: "warning",
+        message: `LLM enhancement not available: ${error.message}`,
       });
     }
 
     // Test 6: Location Services Test
     try {
       const startTime = Date.now();
-      
+
       if (LocationSoilService.isGeolocationSupported()) {
         updateTest(5, {
-          status: 'success',
-          message: 'Geolocation API is supported',
-          duration: Date.now() - startTime
+          status: "success",
+          message: "Geolocation API is supported",
+          duration: Date.now() - startTime,
         });
         successCount++;
       } else {
         updateTest(5, {
-          status: 'warning',
-          message: 'Geolocation not supported in this browser'
+          status: "warning",
+          message: "Geolocation not supported in this browser",
         });
       }
     } catch (error: any) {
       updateTest(5, {
-        status: 'failed',
-        message: `Location services test failed: ${error.message}`
+        status: "failed",
+        message: `Location services test failed: ${error.message}`,
       });
     }
 
@@ -263,21 +318,23 @@ const IntegrationTestDashboard: React.FC = () => {
       // Test with sample coordinates (New Delhi, India)
       const soilData = await LocationSoilService.getSoilDataByLocation({
         latitude: 28.6139,
-        longitude: 77.2090
+        longitude: 77.209,
       });
       const duration = Date.now() - startTime;
 
       updateTest(6, {
-        status: 'success',
-        message: `Soil type detected: ${soilData.soil_type} (${(soilData.confidence * 100).toFixed(1)}% confidence)`,
+        status: "success",
+        message: `Soil type detected: ${soilData.soil_type} (${(
+          soilData.confidence * 100
+        ).toFixed(1)}% confidence)`,
         details: soilData,
-        duration
+        duration,
       });
       successCount++;
     } catch (error: any) {
       updateTest(6, {
-        status: 'failed',
-        message: `Soil data integration failed: ${error.message}`
+        status: "failed",
+        message: `Soil data integration failed: ${error.message}`,
       });
     }
 
@@ -285,12 +342,12 @@ const IntegrationTestDashboard: React.FC = () => {
     try {
       const startTime = Date.now();
       const testInput = {
-        farmId: 'test-farm-001',
-        farmName: 'Test Farm',
+        farmId: "test-farm-001",
+        farmName: "Test Farm",
         farmSize: 2.5,
-        farmUnit: 'acres',
-        cropType: 'Rice',
-        soilType: 'Loamy',
+        farmUnit: "acres",
+        cropType: "Rice",
+        soilType: "Loamy",
         temperature: 28,
         humidity: 75,
         moisture: 45,
@@ -299,68 +356,73 @@ const IntegrationTestDashboard: React.FC = () => {
         phosphorus: 40,
         potassium: 50,
         latitude: 28.6139,
-        longitude: 77.2090,
-        sowingDate: '2024-02-01'
+        longitude: 77.209,
+        sowingDate: "2024-02-01",
       };
 
-      const result = await integratedMLService.getComprehensivePrediction(testInput);
+      const result = await integratedMLService.getComprehensivePrediction(
+        testInput
+      );
       const duration = Date.now() - startTime;
 
       if (result.success) {
-        const formatted = integratedMLService.formatPredictionForDisplay(result);
+        const formatted =
+          integratedMLService.formatPredictionForDisplay(result);
         updateTest(7, {
-          status: 'success',
+          status: "success",
           message: `Complete integration successful (${result.prediction_type}): ${result.ml_prediction.fertilizer}`,
           details: formatted,
-          duration
+          duration,
         });
         successCount++;
       } else {
         updateTest(7, {
-          status: 'failed',
-          message: 'Complete integration test failed',
-          details: result
+          status: "failed",
+          message: "Complete integration test failed",
+          details: result,
         });
       }
     } catch (error: any) {
       updateTest(7, {
-        status: 'failed',
-        message: `Integration test failed: ${error.message}`
+        status: "failed",
+        message: `Integration test failed: ${error.message}`,
       });
     }
 
     // Update overall status
     setIsRunning(false);
     if (successCount === totalTests) {
-      setOverallStatus('success');
+      setOverallStatus("success");
     } else if (successCount > totalTests / 2) {
-      setOverallStatus('success');
+      setOverallStatus("success");
     } else {
-      setOverallStatus('failed');
+      setOverallStatus("failed");
     }
   };
 
-  const getStatusIcon = (status: TestResult['status']) => {
+  const getStatusIcon = (status: TestResult["status"]) => {
     switch (status) {
-      case 'success':
+      case "success":
         return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'failed':
+      case "failed":
         return <XCircle className="h-5 w-5 text-red-600" />;
-      case 'warning':
+      case "warning":
         return <AlertCircle className="h-5 w-5 text-yellow-600" />;
-      case 'pending':
-        return isRunning ? 
-          <Loader2 className="h-5 w-5 text-blue-600 animate-spin" /> :
-          <AlertCircle className="h-5 w-5 text-gray-400" />;
+      case "pending":
+        return isRunning ? (
+          <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
+        ) : (
+          <AlertCircle className="h-5 w-5 text-gray-400" />
+        );
     }
   };
 
-  const getStatusBadge = (status: TestResult['status']) => {
+  const getStatusBadge = (status: TestResult["status"]) => {
     const variants = {
-      success: 'bg-green-100 text-green-800',
-      failed: 'bg-red-100 text-red-800',
-      warning: 'bg-yellow-100 text-yellow-800',
-      pending: 'bg-gray-100 text-gray-600'
+      success: "bg-green-100 text-green-800",
+      failed: "bg-red-100 text-red-800",
+      warning: "bg-yellow-100 text-yellow-800",
+      pending: "bg-gray-100 text-gray-600",
     };
 
     return (
@@ -379,7 +441,7 @@ const IntegrationTestDashboard: React.FC = () => {
       <Brain className="h-4 w-4" />,
       <MapPin className="h-4 w-4" />,
       <Wifi className="h-4 w-4" />,
-      <CheckCircle className="h-4 w-4" />
+      <CheckCircle className="h-4 w-4" />,
     ];
     return icons[index] || <TestTube className="h-4 w-4" />;
   };
@@ -402,8 +464,8 @@ const IntegrationTestDashboard: React.FC = () => {
         <CardContent>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
-              <Button 
-                onClick={runTests} 
+              <Button
+                onClick={runTests}
                 disabled={isRunning}
                 className="flex items-center space-x-2"
               >
@@ -419,24 +481,28 @@ const IntegrationTestDashboard: React.FC = () => {
                   </>
                 )}
               </Button>
-              
-              {overallStatus !== 'idle' && (
+
+              {overallStatus !== "idle" && (
                 <div className="flex items-center space-x-2">
-                  {overallStatus === 'success' && <CheckCircle className="h-5 w-5 text-green-600" />}
-                  {overallStatus === 'failed' && <XCircle className="h-5 w-5 text-red-600" />}
-                  {overallStatus === 'testing' && <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />}
+                  {overallStatus === "success" && (
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  )}
+                  {overallStatus === "failed" && (
+                    <XCircle className="h-5 w-5 text-red-600" />
+                  )}
+                  {overallStatus === "testing" && (
+                    <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
+                  )}
                   <span className="font-medium">
-                    {overallStatus === 'success' && 'All Tests Completed'}
-                    {overallStatus === 'failed' && 'Some Tests Failed'}
-                    {overallStatus === 'testing' && 'Testing in Progress...'}
+                    {overallStatus === "success" && "All Tests Completed"}
+                    {overallStatus === "failed" && "Some Tests Failed"}
+                    {overallStatus === "testing" && "Testing in Progress..."}
                   </span>
                 </div>
               )}
             </div>
-            
-            <div className="text-sm text-gray-500">
-              API URL: {backendUrl}
-            </div>
+
+            <div className="text-sm text-gray-500">API URL: {backendUrl}</div>
           </div>
 
           {/* Test Results Summary */}
@@ -489,11 +555,9 @@ const IntegrationTestDashboard: React.FC = () => {
                     {getStatusIcon(test.status)}
                   </div>
                 </div>
-                
-                <p className="text-sm text-gray-600 mb-2">
-                  {test.message}
-                </p>
-                
+
+                <p className="text-sm text-gray-600 mb-2">{test.message}</p>
+
                 {test.details && (
                   <details className="text-xs">
                     <summary className="cursor-pointer text-blue-600 hover:text-blue-800">
@@ -511,26 +575,28 @@ const IntegrationTestDashboard: React.FC = () => {
       </Card>
 
       {/* Integration Status Alert */}
-      {overallStatus === 'success' && (
+      {overallStatus === "success" && (
         <Card className="border-green-200 bg-green-50">
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2">
               <CheckCircle className="h-5 w-5 text-green-600" />
               <span className="text-green-800 font-medium">
-                🎉 Backend-Frontend integration is working perfectly! All systems are operational.
+                🎉 Backend-Frontend integration is working perfectly! All
+                systems are operational.
               </span>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {overallStatus === 'failed' && (
+      {overallStatus === "failed" && (
         <Card className="border-red-200 bg-red-50">
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2">
               <XCircle className="h-5 w-5 text-red-600" />
               <span className="text-red-800 font-medium">
-                ⚠️ Some integration tests failed. Please check the backend connection and try again.
+                ⚠️ Some integration tests failed. Please check the backend
+                connection and try again.
               </span>
             </div>
           </CardContent>
