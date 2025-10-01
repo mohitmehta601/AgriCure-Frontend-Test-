@@ -248,12 +248,17 @@ export const MLTestComponent = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="rice">Rice</SelectItem>
-                        <SelectItem value="Wheat">Wheat</SelectItem>
-                        <SelectItem value="Sugarcane">Sugarcane</SelectItem>
+                        <SelectItem value="Tea">Tea</SelectItem>
                         <SelectItem value="Cotton">Cotton</SelectItem>
-                        <SelectItem value="coffee">Coffee</SelectItem>
-                        <SelectItem value="watermelon">Watermelon</SelectItem>
+                        <SelectItem value="Maize">Maize</SelectItem>
+                        <SelectItem value="Groundnut">Groundnut</SelectItem>
+                        <SelectItem value="Pulses">Pulses</SelectItem>
+                        <SelectItem value="Millets">Millets</SelectItem>
+                        <SelectItem value="Rice">Rice</SelectItem>
+                        <SelectItem value="Soybean">Soybean</SelectItem>
+                        <SelectItem value="Sugarcane">Sugarcane</SelectItem>
+                        <SelectItem value="Wheat">Wheat</SelectItem>
+                        <SelectItem value="Coffee">Coffee</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

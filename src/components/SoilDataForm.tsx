@@ -177,12 +177,17 @@ const SoilDataForm = ({ onSubmit }) => {
                 <SelectValue placeholder="Select crop type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="wheat">Wheat</SelectItem>
-                <SelectItem value="corn">Corn</SelectItem>
-                <SelectItem value="rice">Rice</SelectItem>
-                <SelectItem value="soybeans">Soybeans</SelectItem>
-                <SelectItem value="vegetables">Vegetables</SelectItem>
-                <SelectItem value="fruits">Fruits</SelectItem>
+                <SelectItem value="Tea">Tea</SelectItem>
+                <SelectItem value="Cotton">Cotton</SelectItem>
+                <SelectItem value="Maize">Maize</SelectItem>
+                <SelectItem value="Groundnut">Groundnut</SelectItem>
+                <SelectItem value="Pulses">Pulses</SelectItem>
+                <SelectItem value="Millets">Millets</SelectItem>
+                <SelectItem value="Rice">Rice</SelectItem>
+                <SelectItem value="Soybean">Soybean</SelectItem>
+                <SelectItem value="Sugarcane">Sugarcane</SelectItem>
+                <SelectItem value="Wheat">Wheat</SelectItem>
+                <SelectItem value="Coffee">Coffee</SelectItem>
               </SelectContent>
             </Select>
           </div>
