@@ -115,9 +115,21 @@ const Dashboard = () => {
     }
   };
 
-  const generateEnhancedRecommendations = async (
-    data: FormData
-  ): Promise<EnhancedRecommendation> => {
+  const generateEnhancedRecommendations = async (data: {
+    selectedFarmId: string;
+    fieldName: string;
+    fieldSize: string;
+    sizeUnit: string;
+    cropType: string;
+    soilPH: string;
+    nitrogen: string;
+    phosphorus: string;
+    potassium: string;
+    soilType: string;
+    temperature: string;
+    humidity: string;
+    soilMoisture: string;
+  }): Promise<EnhancedRecommendation> => {
     const pH = parseFloat(data.soilPH);
     const nitrogen = parseFloat(data.nitrogen);
     const phosphorus = parseFloat(data.phosphorus);
@@ -401,6 +413,7 @@ const Dashboard = () => {
             recommendations: enhancedRecommendations,
             formData: formDataForRecommendations,
             isLLMEnhanced: false,
+            useDetailedView: true, // Use the new detailed view by default
           },
         });
       }

@@ -11,6 +11,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Recommendations from "./pages/Recommendations";
 import RecommendationDetails from "./pages/RecommendationDetails";
+import DetailedRecommendationsPage from "./pages/DetailedRecommendationsPage";
 import NotFound from "./pages/NotFound";
 import Video from "./pages/Video";
 import { EnhancedMLDemo } from "./components/EnhancedMLDemo";
@@ -32,6 +33,10 @@ const App = () => (
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/recommendations" element={<Recommendations />} />
+              <Route
+                path="/recommendations/detailed"
+                element={<DetailedRecommendationsPage />}
+              />
               <Route
                 path="/recommendations/:id"
                 element={<RecommendationDetails />}

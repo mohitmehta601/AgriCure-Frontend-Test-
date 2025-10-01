@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import EnhancedFertilizerRecommendations from "@/components/EnhancedFertilizerRecommendations";
+import DetailedFertilizerRecommendations from "@/components/DetailedFertilizerRecommendations";
 import LLMEnhancedFertilizerRecommendations from "@/components/LLMEnhancedFertilizerRecommendations";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -67,8 +68,13 @@ const Recommendations = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
-  const { recommendations, formData, llmEnhancedData, isLLMEnhanced } =
-    location.state || {};
+  const {
+    recommendations,
+    formData,
+    llmEnhancedData,
+    isLLMEnhanced,
+    useDetailedView,
+  } = location.state || {};
 
   const handleBack = () => {
     navigate("/dashboard", { state: { activeTab: "recommendations" } });
@@ -83,9 +89,21 @@ const Recommendations = () => {
   // Determine which component to render based on data type
   const shouldUseLLMComponent =
     isLLMEnhanced && llmEnhancedData?.llmEnhancedResult;
+  const shouldUseDetailedView = useDetailedView || false;
   const displayFormData = llmEnhancedData || formData;
   const farmName =
     llmEnhancedData?.farm?.name || formData?.fieldName || "Unknown Farm";
+
+  // If detailed view is requested, use the detailed component
+  if (shouldUseDetailedView && recommendations && displayFormData) {
+    return (
+      <DetailedFertilizerRecommendations
+        recommendations={recommendations}
+        formData={displayFormData}
+        isFromHistory={false}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
