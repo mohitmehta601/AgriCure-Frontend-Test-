@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/services/authService";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import QRScanner from "@/components/QRScanner";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -33,6 +34,13 @@ const Signup = () => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleQRScan = (scannedData: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      productId: scannedData,
     }));
   };
 
@@ -126,16 +134,21 @@ const Signup = () => {
                 <Label htmlFor="productId" className="text-sm md:text-base">
                   Product ID
                 </Label>
-                <Input
-                  id="productId"
-                  name="productId"
-                  type="text"
-                  placeholder="Enter your product ID"
-                  value={formData.productId}
-                  onChange={handleChange}
-                  required
-                  className="mt-1"
-                />
+                <div className="flex items-center space-x-2 mt-1">
+                  <Input
+                    id="productId"
+                    name="productId"
+                    type="text"
+                    placeholder="Enter your product ID"
+                    value={formData.productId}
+                    onChange={handleChange}
+                    required
+                    className="flex-1 min-w-0"
+                  />
+                  <div className="flex-shrink-0">
+                    <QRScanner onScan={handleQRScan} />
+                  </div>
+                </div>
               </div>
               <div>
                 <Label htmlFor="name" className="text-sm md:text-base">

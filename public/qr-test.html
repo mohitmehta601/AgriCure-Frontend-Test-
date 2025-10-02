@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Test - AgriCure</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2d5016;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .qr-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .qr-code {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .qr-code img {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 10px;
+        }
+        .qr-label {
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 5px;
+        }
+        .qr-value {
+            font-family: monospace;
+            background: #f3f4f6;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .instructions {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .instructions h3 {
+            color: #15803d;
+            margin-top: 0;
+        }
+        .instructions ol {
+            color: #374151;
+        }
+        .instructions li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 AgriCure QR Scanner Test Page</h1>
+        
+        <div class="qr-section">
+            <div class="qr-code">
+                <div class="qr-label">Sample Product ID QR Code</div>
+                <div id="qr1"></div>
+                <div class="qr-value">AGR-2024-001-FERTILIZER</div>
+            </div>
+            
+            <div class="qr-code">
+                <div class="qr-label">Another Product ID</div>
+                <div id="qr2"></div>
+                <div class="qr-value">AGR-2024-002-PESTICIDE</div>
+            </div>
+            
+            <div class="qr-code">
+                <div class="qr-label">Premium Product</div>
+                <div id="qr3"></div>
+                <div class="qr-value">AGR-2024-PRE-ORGANIC</div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>📱 How to Test the QR Scanner</h3>
+            <ol>
+                <li>Navigate to the <strong>Signup page</strong> in your AgriCure application</li>
+                <li>Look for the <strong>"Product ID"</strong> input field</li>
+                <li>Click the <strong>"Scan QR"</strong> button next to the input field</li>
+                <li>Allow camera permissions when prompted</li>
+                <li>Point your camera at one of the QR codes above</li>
+                <li>The Product ID should automatically fill in the input field</li>
+            </ol>
+            
+            <p><strong>Note:</strong> Make sure you're using a secure connection (HTTPS) for camera access to work properly. If testing locally, use <code>https://localhost:8080</code> or test on a mobile device with the network URL.</p>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+    <script>
+        // Generate QR codes for testing
+        function generateQR(elementId, text) {
+            const qr = qrcode(0, 'M');
+            qr.addData(text);
+            qr.make();
+            document.getElementById(elementId).innerHTML = qr.createImgTag(5, 10);
+        }
+        
+        // Generate test QR codes
+        generateQR('qr1', 'AGR-2024-001-FERTILIZER');
+        generateQR('qr2', 'AGR-2024-002-PESTICIDE');
+        generateQR('qr3', 'AGR-2024-PRE-ORGANIC');
+    </script>
+</body>
+</html>
