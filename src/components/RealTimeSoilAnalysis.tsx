@@ -1,42 +1,70 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Wifi, WifiOff } from "lucide-react";
 import { useEffect, useState } from "react";
-import { fetchThingSpeakHistoricalData, ThingSpeakData } from "@/services/thingSpeakService";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import {
+  fetchThingSpeakHistoricalData,
+  ThingSpeakData,
+} from "@/services/thingSpeakService";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useRealTimeData } from "@/contexts/RealTimeDataContext";
 
 const RealTimeSoilAnalysis = () => {
   const { t } = useLanguage();
-  const { realTimeData: data, isLoading: loading, isConnected, refreshData } = useRealTimeData();
+  const {
+    realTimeData: data,
+    isLoading: loading,
+    isConnected,
+    refreshData,
+  } = useRealTimeData();
   const [historicalData, setHistoricalData] = useState<any[]>([]);
 
   const loadHistoricalData = async () => {
     try {
       const historicalData = await fetchThingSpeakHistoricalData(24);
       if (historicalData && historicalData.length > 0) {
-        const chartData = historicalData.map((item, index) => {
-          const timestamp = new Date(item.timestamp);
-          const now = new Date();
-          const hoursAgo = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60 * 60));
-          
-          return {
-            time: hoursAgo <= 0 ? 'Now' : `${hoursAgo}h ago`,
-            nitrogen: item.nitrogen,
-            phosphorus: item.phosphorus,
-            potassium: item.potassium,
-            moisture: item.soilMoisture,
-            temperature: item.temperature,
-            humidity: item.humidity,
-            ph: item.soilPH
-          };
-        }).reverse();
+        const chartData = historicalData
+          .map((item, index) => {
+            const timestamp = new Date(item.timestamp);
+            const now = new Date();
+            const hoursAgo = Math.floor(
+              (now.getTime() - timestamp.getTime()) / (1000 * 60 * 60)
+            );
+
+            return {
+              time: hoursAgo <= 0 ? "Now" : `${hoursAgo}h ago`,
+              nitrogen: item.nitrogen,
+              phosphorus: item.phosphorus,
+              potassium: item.potassium,
+              moisture: item.soilMoisture,
+              temperature: item.temperature,
+              humidity: item.humidity,
+              ph: item.soilPH,
+            };
+          })
+          .reverse();
         setHistoricalData(chartData);
       }
     } catch (error) {
-      console.error('Error loading historical data:', error);
+      console.error("Error loading historical data:", error);
       const mockHistorical = Array.from({ length: 24 }, (_, i) => ({
         time: `${23 - i}h ago`,
         nitrogen: 40 + Math.random() * 20,
@@ -45,7 +73,7 @@ const RealTimeSoilAnalysis = () => {
         moisture: 60 + Math.random() * 20,
         temperature: 20 + Math.random() * 10,
         humidity: 65 + Math.random() * 20,
-        ph: 6.5
+        ph: 6.5,
       }));
       setHistoricalData(mockHistorical);
     }
@@ -60,17 +88,17 @@ const RealTimeSoilAnalysis = () => {
     return () => clearInterval(interval);
   }, []);
 
-  type NutrientType = 'nitrogen' | 'phosphorus' | 'potassium';
+  type NutrientType = "nitrogen" | "phosphorus" | "potassium";
 
   const getNutrientStatus = (type: NutrientType, value: number) => {
-    if (type === 'nitrogen') {
-      if (value > 180) return { status: 'critical', color: 'text-red-600' };
-      if (value >= 81) return { status: 'optimal', color: 'text-green-600' };
-      return { status: 'warning', color: 'text-yellow-600' };
+    if (type === "nitrogen") {
+      if (value > 180) return { status: "critical", color: "text-red-600" };
+      if (value >= 81) return { status: "optimal", color: "text-green-600" };
+      return { status: "warning", color: "text-yellow-600" };
     }
-    if (value > 350) return { status: 'critical', color: 'text-red-600' };
-    if (value >= 111) return { status: 'optimal', color: 'text-green-600' };
-    return { status: 'warning', color: 'text-yellow-600' };
+    if (value > 350) return { status: "critical", color: "text-red-600" };
+    if (value >= 111) return { status: "optimal", color: "text-green-600" };
+    return { status: "warning", color: "text-yellow-600" };
   };
 
   const clampPercent = (percent: number) => Math.max(0, Math.min(100, percent));
@@ -100,24 +128,35 @@ const RealTimeSoilAnalysis = () => {
           {isConnected ? (
             <>
               <Wifi className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-              <span className="text-xs xs:text-sm font-medium text-green-600">{t('dashboard.connectedToThingSpeak')}</span>
+              <span className="text-xs xs:text-sm font-medium text-green-600">
+                {t("dashboard.connectedToThingSpeak")}
+              </span>
             </>
           ) : (
             <>
               <WifiOff className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
-              <span className="text-xs xs:text-sm font-medium text-red-600">{t('dashboard.usingDemoData')}</span>
+              <span className="text-xs xs:text-sm font-medium text-red-600">
+                {t("dashboard.usingDemoData")}
+              </span>
             </>
           )}
         </div>
-        <Button 
-          onClick={() => { refreshData(); loadHistoricalData(); }} 
-          variant="outline" 
-          size="sm" 
-          disabled={loading} 
+        <Button
+          onClick={() => {
+            refreshData();
+            loadHistoricalData();
+          }}
+          variant="outline"
+          size="sm"
+          disabled={loading}
           className="text-xs xs:text-sm w-full xs:w-auto"
         >
-          <RefreshCw className={`h-3 w-3 xs:h-4 xs:w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-          {t('dashboard.refreshData')}
+          <RefreshCw
+            className={`h-3 w-3 xs:h-4 xs:w-4 mr-2 ${
+              loading ? "animate-spin" : ""
+            }`}
+          />
+          {t("dashboard.refreshData")}
         </Button>
       </div>
 
@@ -125,124 +164,242 @@ const RealTimeSoilAnalysis = () => {
       <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 xs:gap-4 sm:gap-6">
         <Card className="hover:shadow-md transition-shadow duration-200 bg-white">
           <CardHeader className="pb-2 px-3 xs:px-4 sm:px-6 pt-3 xs:pt-4 sm:pt-6">
-            <CardTitle className="text-xs xs:text-sm font-medium text-gray-700">{t('dashboard.nitrogen')}</CardTitle>
+            <CardTitle className="text-xs xs:text-sm font-medium text-gray-700">
+              {t("dashboard.nitrogen")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-3 xs:px-4 sm:px-6 pb-3 xs:pb-4 sm:pb-6">
             <div className="text-base xs:text-lg sm:text-2xl font-bold mb-2 text-gray-900">
-              {data?.nitrogen.toFixed(1)} 
-              <span className="text-xs xs:text-sm font-normal text-gray-500 ml-1">mg/kg</span>
+              {data?.nitrogen.toFixed(1)}
+              <span className="text-xs xs:text-sm font-normal text-gray-500 ml-1">
+                mg/kg
+              </span>
             </div>
-            <Progress value={clampPercent(((data?.nitrogen ?? 0) / 240) * 100)} className="h-1.5 xs:h-2 mb-2" />
-            {(() => { const s = getNutrientStatus('nitrogen', data?.nitrogen ?? 0); return (
-              <div className={`text-xs font-medium ${s.color}`}>{s.status.toUpperCase()}</div>
-            ); })()}
+            <Progress
+              value={clampPercent(((data?.nitrogen ?? 0) / 240) * 100)}
+              className="h-1.5 xs:h-2 mb-2"
+            />
+            {(() => {
+              const s = getNutrientStatus("nitrogen", data?.nitrogen ?? 0);
+              return (
+                <div className={`text-xs font-medium ${s.color}`}>
+                  {s.status.toUpperCase()}
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">{t('dashboard.phosphorus')}</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              {t("dashboard.phosphorus")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-            <div className="text-lg sm:text-2xl font-bold mb-2">{data?.phosphorus.toFixed(1)} mg/kg</div>
-            <Progress value={clampPercent(((data?.phosphorus ?? 0) / 400) * 100)} className="h-1 sm:h-2 mb-2" />
-            {(() => { const s = getNutrientStatus('phosphorus', data?.phosphorus ?? 0); return (
-              <div className={`text-xs ${s.color}`}>{s.status.toUpperCase()}</div>
-            ); })()}
+            <div className="text-lg sm:text-2xl font-bold mb-2">
+              {data?.phosphorus.toFixed(1)} mg/kg
+            </div>
+            <Progress
+              value={clampPercent(((data?.phosphorus ?? 0) / 400) * 100)}
+              className="h-1 sm:h-2 mb-2"
+            />
+            {(() => {
+              const s = getNutrientStatus("phosphorus", data?.phosphorus ?? 0);
+              return (
+                <div className={`text-xs ${s.color}`}>
+                  {s.status.toUpperCase()}
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">{t('dashboard.potassium')}</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              {t("dashboard.potassium")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-            <div className="text-lg sm:text-2xl font-bold mb-2">{data?.potassium.toFixed(1)} mg/kg</div>
-            <Progress value={clampPercent(((data?.potassium ?? 0) / 400) * 100)} className="h-1 sm:h-2 mb-2" />
-            {(() => { const s = getNutrientStatus('potassium', data?.potassium ?? 0); return (
-              <div className={`text-xs ${s.color}`}>{s.status.toUpperCase()}</div>
-            ); })()}
+            <div className="text-lg sm:text-2xl font-bold mb-2">
+              {data?.potassium.toFixed(1)} mg/kg
+            </div>
+            <Progress
+              value={clampPercent(((data?.potassium ?? 0) / 400) * 100)}
+              className="h-1 sm:h-2 mb-2"
+            />
+            {(() => {
+              const s = getNutrientStatus("potassium", data?.potassium ?? 0);
+              return (
+                <div className={`text-xs ${s.color}`}>
+                  {s.status.toUpperCase()}
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">{t('dashboard.soilPH')}</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              {t("dashboard.soilPH")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-            <div className="text-lg sm:text-2xl font-bold mb-2">{data?.soilPH.toFixed(1)}</div>
-            <Progress value={clampPercent(((data?.soilPH ?? 0) / 14) * 100)} className="h-1 sm:h-2 mb-2" />
+            <div className="text-lg sm:text-2xl font-bold mb-2">
+              {data?.soilPH.toFixed(1)}
+            </div>
+            <Progress
+              value={clampPercent(((data?.soilPH ?? 0) / 14) * 100)}
+              className="h-1 sm:h-2 mb-2"
+            />
             {(() => {
               const value = data?.soilPH ?? 0;
-              const min = 6.0, max = 7.5;
-              const status = (value >= min && value <= max) ? 'optimal' : (value < min * 0.8 || value > max * 1.2) ? 'critical' : 'warning';
-              const color = status === 'optimal' ? 'text-green-600' : status === 'critical' ? 'text-red-600' : 'text-yellow-600';
-              return <div className={`text-xs ${color}`}>{status.toUpperCase()}</div>;
+              const min = 6.0,
+                max = 7.5;
+              const status =
+                value >= min && value <= max
+                  ? "optimal"
+                  : value < min * 0.8 || value > max * 1.2
+                  ? "critical"
+                  : "warning";
+              const color =
+                status === "optimal"
+                  ? "text-green-600"
+                  : status === "critical"
+                  ? "text-red-600"
+                  : "text-yellow-600";
+              return (
+                <div className={`text-xs ${color}`}>{status.toUpperCase()}</div>
+              );
             })()}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">{t('dashboard.soilMoisture')}</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              {t("dashboard.soilMoisture")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-            <div className="text-lg sm:text-2xl font-bold mb-2">{data?.soilMoisture.toFixed(1)}%</div>
-            <Progress value={clampPercent(data?.soilMoisture ?? 0)} className="h-1 sm:h-2 mb-2" />
+            <div className="text-lg sm:text-2xl font-bold mb-2">
+              {data?.soilMoisture.toFixed(1)}%
+            </div>
+            <Progress
+              value={clampPercent(data?.soilMoisture ?? 0)}
+              className="h-1 sm:h-2 mb-2"
+            />
             {(() => {
               const value = data?.soilMoisture ?? 0;
-              const min = 40, max = 80;
-              const status = (value >= min && value <= max) ? 'optimal' : (value < min * 0.8 || value > max * 1.2) ? 'critical' : 'warning';
-              const color = status === 'optimal' ? 'text-green-600' : status === 'critical' ? 'text-red-600' : 'text-yellow-600';
-              return <div className={`text-xs ${color}`}>{status.toUpperCase()}</div>;
+              const min = 40,
+                max = 80;
+              const status =
+                value >= min && value <= max
+                  ? "optimal"
+                  : value < min * 0.8 || value > max * 1.2
+                  ? "critical"
+                  : "warning";
+              const color =
+                status === "optimal"
+                  ? "text-green-600"
+                  : status === "critical"
+                  ? "text-red-600"
+                  : "text-yellow-600";
+              return (
+                <div className={`text-xs ${color}`}>{status.toUpperCase()}</div>
+              );
             })()}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">{t('dashboard.temperature')}</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              {t("dashboard.temperature")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-            <div className="text-lg sm:text-2xl font-bold mb-2">{data?.temperature.toFixed(1)}°C</div>
-            <Progress value={clampPercent(((data?.temperature ?? 0) / 50) * 100)} className="h-1 sm:h-2 mb-2" />
+            <div className="text-lg sm:text-2xl font-bold mb-2">
+              {data?.temperature.toFixed(1)}°C
+            </div>
+            <Progress
+              value={clampPercent(((data?.temperature ?? 0) / 50) * 100)}
+              className="h-1 sm:h-2 mb-2"
+            />
             {(() => {
               const value = data?.temperature ?? 0;
-              const min = 15, max = 35;
-              const status = (value >= min && value <= max) ? 'optimal' : (value < min * 0.8 || value > max * 1.2) ? 'critical' : 'warning';
-              const color = status === 'optimal' ? 'text-green-600' : status === 'critical' ? 'text-red-600' : 'text-yellow-600';
-              return <div className={`text-xs ${color}`}>{status.toUpperCase()}</div>;
+              const min = 15,
+                max = 35;
+              const status =
+                value >= min && value <= max
+                  ? "optimal"
+                  : value < min * 0.8 || value > max * 1.2
+                  ? "critical"
+                  : "warning";
+              const color =
+                status === "optimal"
+                  ? "text-green-600"
+                  : status === "critical"
+                  ? "text-red-600"
+                  : "text-yellow-600";
+              return (
+                <div className={`text-xs ${color}`}>{status.toUpperCase()}</div>
+              );
             })()}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">{t('dashboard.humidity')}</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              {t("dashboard.humidity")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-            <div className="text-lg sm:text-2xl font-bold mb-2">{data?.humidity.toFixed(1)}%</div>
-            <Progress value={clampPercent(data?.humidity ?? 0)} className="h-1 sm:h-2 mb-2" />
+            <div className="text-lg sm:text-2xl font-bold mb-2">
+              {data?.humidity.toFixed(1)}%
+            </div>
+            <Progress
+              value={clampPercent(data?.humidity ?? 0)}
+              className="h-1 sm:h-2 mb-2"
+            />
             {(() => {
               const value = data?.humidity ?? 0;
-              const min = 50, max = 80;
-              const status = (value >= min && value <= max) ? 'optimal' : (value < min * 0.8 || value > max * 1.2) ? 'critical' : 'warning';
-              const color = status === 'optimal' ? 'text-green-600' : status === 'critical' ? 'text-red-600' : 'text-yellow-600';
-              return <div className={`text-xs ${color}`}>{status.toUpperCase()}</div>;
+              const min = 50,
+                max = 80;
+              const status =
+                value >= min && value <= max
+                  ? "optimal"
+                  : value < min * 0.8 || value > max * 1.2
+                  ? "critical"
+                  : "warning";
+              const color =
+                status === "optimal"
+                  ? "text-green-600"
+                  : status === "critical"
+                  ? "text-red-600"
+                  : "text-yellow-600";
+              return (
+                <div className={`text-xs ${color}`}>{status.toUpperCase()}</div>
+              );
             })()}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">{t('dashboard.lastUpdated')}</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              {t("dashboard.lastUpdated")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
             <div className="text-sm font-medium">
-              {data ? new Date(data.timestamp).toLocaleTimeString() : 'N/A'}
+              {data ? new Date(data.timestamp).toLocaleTimeString() : "N/A"}
             </div>
             <div className="text-xs text-gray-500 mt-1">
-              {data ? new Date(data.timestamp).toLocaleDateString() : 'N/A'}
+              {data ? new Date(data.timestamp).toLocaleDateString() : "N/A"}
             </div>
           </CardContent>
         </Card>
@@ -252,8 +409,12 @@ const RealTimeSoilAnalysis = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card>
           <CardHeader className="px-4 sm:px-6">
-            <CardTitle className="text-lg sm:text-xl">{t('dashboard.npkLevelsTrend')}</CardTitle>
-            <CardDescription className="text-sm sm:text-base">{t('dashboard.historicalNutrientLevels')}</CardDescription>
+            <CardTitle className="text-lg sm:text-xl">
+              {t("dashboard.npkLevelsTrend")}
+            </CardTitle>
+            <CardDescription className="text-sm sm:text-base">
+              {t("dashboard.historicalNutrientLevels")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
             <ResponsiveContainer width="100%" height={250}>
@@ -262,9 +423,24 @@ const RealTimeSoilAnalysis = () => {
                 <XAxis dataKey="time" fontSize={12} />
                 <YAxis fontSize={12} />
                 <Tooltip />
-                <Line type="monotone" dataKey="nitrogen" stroke="#22c55e" strokeWidth={2} />
-                <Line type="monotone" dataKey="phosphorus" stroke="#3b82f6" strokeWidth={2} />
-                <Line type="monotone" dataKey="potassium" stroke="#f59e0b" strokeWidth={2} />
+                <Line
+                  type="monotone"
+                  dataKey="nitrogen"
+                  stroke="#22c55e"
+                  strokeWidth={2}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="phosphorus"
+                  stroke="#3b82f6"
+                  strokeWidth={2}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="potassium"
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -272,8 +448,12 @@ const RealTimeSoilAnalysis = () => {
 
         <Card>
           <CardHeader className="px-4 sm:px-6">
-            <CardTitle className="text-lg sm:text-xl">{t('dashboard.environmentalConditions')}</CardTitle>
-            <CardDescription className="text-sm sm:text-base">{t('dashboard.temperatureHumidityMoisture')}</CardDescription>
+            <CardTitle className="text-lg sm:text-xl">
+              {t("dashboard.environmentalConditions")}
+            </CardTitle>
+            <CardDescription className="text-sm sm:text-base">
+              {t("dashboard.temperatureHumidityMoisture")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
             <ResponsiveContainer width="100%" height={250}>

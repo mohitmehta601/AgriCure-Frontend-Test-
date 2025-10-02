@@ -475,21 +475,27 @@ const Dashboard = () => {
               value="overview"
               className="text-xs xs:text-sm sm:text-base px-1 xs:px-2 sm:px-3 md:px-4 py-2.5 xs:py-3 sm:py-3 font-medium whitespace-nowrap data-[state=active]:bg-grass-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md transition-all duration-200 hover:bg-grass-50"
             >
-              <span className="hidden xs:inline">{t("dashboard.overview")}</span>
+              <span className="hidden xs:inline">
+                {t("dashboard.overview")}
+              </span>
               <span className="xs:hidden">Overview</span>
             </TabsTrigger>
             <TabsTrigger
               value="soil-analysis"
               className="text-xs xs:text-sm sm:text-base px-1 xs:px-2 sm:px-3 md:px-4 py-2.5 xs:py-3 sm:py-3 font-medium whitespace-nowrap data-[state=active]:bg-grass-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md transition-all duration-200 hover:bg-grass-50"
             >
-              <span className="hidden sm:inline">{t("dashboard.soilAnalysis")}</span>
+              <span className="hidden sm:inline">
+                {t("dashboard.soilAnalysis")}
+              </span>
               <span className="sm:hidden">Soil Analysis</span>
             </TabsTrigger>
             <TabsTrigger
               value="recommendations"
               className="text-xs xs:text-sm sm:text-base px-1 xs:px-2 sm:px-3 md:px-4 py-2.5 xs:py-3 sm:py-3 font-medium whitespace-nowrap data-[state=active]:bg-grass-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md transition-all duration-200 hover:bg-grass-50"
             >
-              <span className="hidden xs:inline">{t("dashboard.recommendations")}</span>
+              <span className="hidden xs:inline">
+                {t("dashboard.recommendations")}
+              </span>
               <span className="xs:hidden">Recs</span>
             </TabsTrigger>
           </TabsList>
