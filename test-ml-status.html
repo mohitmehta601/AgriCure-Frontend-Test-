@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Model Status Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        .crop-grid, .soil-grid {
+            display: grid;
+            gap: 8px;
+            margin: 20px 0;
+        }
+        .crop-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+        .soil-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            transition: transform 0.2s;
+        }
+        .item:hover {
+            transform: scale(1.05);
+        }
+        .emoji {
+            font-size: 20px;
+        }
+        .name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        h2 {
+            color: #374151;
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 8px;
+        }
+        h3 {
+            color: #374151;
+            border-bottom: 2px solid #f59e0b;
+            padding-bottom: 8px;
+        }
+        .count {
+            background: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .count.soil {
+            background: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <h1>AgriCure ML Model Status - Supported Types</h1>
+    
+    <h2>🌾 Supported Crop Types <span class="count">11 Types</span></h2>
+    <div class="crop-grid">
+        <div class="item"><span class="emoji">🍃</span><span class="name">Tea</span></div>
+        <div class="item"><span class="emoji">🌱</span><span class="name">Cotton</span></div>
+        <div class="item"><span class="emoji">🌽</span><span class="name">Maize</span></div>
+        <div class="item"><span class="emoji">🥜</span><span class="name">Groundnut</span></div>
+        <div class="item"><span class="emoji">🫘</span><span class="name">Pulses</span></div>
+        <div class="item"><span class="emoji">🌾</span><span class="name">Millets</span></div>
+        <div class="item"><span class="emoji">🍚</span><span class="name">Rice</span></div>
+        <div class="item"><span class="emoji">🌿</span><span class="name">Soybean</span></div>
+        <div class="item"><span class="emoji">🎋</span><span class="name">Sugarcane</span></div>
+        <div class="item"><span class="emoji">🌾</span><span class="name">Wheat</span></div>
+        <div class="item"><span class="emoji">☕</span><span class="name">Coffee</span></div>
+    </div>
+
+    <h3>🏔️ Supported Soil Types <span class="count soil">10 Types</span></h3>
+    <div class="soil-grid">
+        <div class="item"><span class="emoji">🏖️</span><span class="name">Sandy</span></div>
+        <div class="item"><span class="emoji">🪨</span><span class="name">Silty</span></div>
+        <div class="item"><span class="emoji">🧱</span><span class="name">Laterite</span></div>
+        <div class="item"><span class="emoji">⚗️</span><span class="name">Alkaline</span></div>
+        <div class="item"><span class="emoji">⚫</span><span class="name">Black</span></div>
+        <div class="item"><span class="emoji">🏺</span><span class="name">Clayey</span></div>
+        <div class="item"><span class="emoji">🧂</span><span class="name">Saline</span></div>
+        <div class="item"><span class="emoji">🟤</span><span class="name">Loamy</span></div>
+        <div class="item"><span class="emoji">🔴</span><span class="name">Red</span></div>
+        <div class="item"><span class="emoji">🌿</span><span class="name">Peaty</span></div>
+    </div>
+
+    <div style="margin-top: 40px; padding: 20px; background: #e0f2fe; border-radius: 8px;">
+        <h3>✅ Implementation Summary</h3>
+        <p><strong>Crop Types Added:</strong> Tea, Cotton, Maize, Groundnut, Pulses, Millets, Rice, Soybean, Sugarcane, Wheat, Coffee (11 total)</p>
+        <p><strong>Soil Types Added:</strong> Sandy, Silty, Laterite, Alkaline, Black, Clayey, Saline, Loamy, Red, Peaty (10 total)</p>
+        <p><strong>Location:</strong> Dashboard → Farm Overview → ML Model Status</p>
+        <p><strong>Features:</strong> Color-coded badges, emojis, responsive grid layout, hover effects, and animations</p>
+    </div>
+</body>
+</html>
