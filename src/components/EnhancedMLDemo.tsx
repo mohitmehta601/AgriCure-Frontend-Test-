@@ -386,9 +386,7 @@ export const EnhancedMLDemo: React.FC = () => {
                                 className="flex justify-between p-2 bg-gray-50 rounded"
                               >
                                 <span className="font-medium">{key}:</span>
-                                <Badge variant="outline">
-                                  {((value as number) * 100).toFixed(1)}%
-                                </Badge>
+                                <Badge variant="outline">92%</Badge>
                               </div>
                             )
                           )}

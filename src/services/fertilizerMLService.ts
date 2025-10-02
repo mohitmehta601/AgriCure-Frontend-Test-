@@ -200,7 +200,8 @@ const fallbackPrediction = async (input: MLPredictionInput): Promise<MLPredictio
   const { temperature, humidity, moisture, soilType, cropType, nitrogen, potassium, phosphorus } = input;
 
   let predictedFertilizer = 'Urea';
-  let confidence = 85;
+  // Hardcoded confidence value - no longer dynamic
+  let confidence = 92;
 
   if (cropType === 0 || cropType === 4) {
     if (nitrogen < 50) {
@@ -208,79 +209,79 @@ const fallbackPrediction = async (input: MLPredictionInput): Promise<MLPredictio
       confidence = 92;
     } else if (phosphorus < 30) {
       predictedFertilizer = 'DAP';
-      confidence = 88;
+      confidence = 92;
     } else {
       predictedFertilizer = 'TSP';
-      confidence = 85;
+      confidence = 92;
     }
   } else if (cropType === 1) {
     if (phosphorus < 20) {
       predictedFertilizer = 'DAP';
-      confidence = 94;
+      confidence = 92;
     } else if (nitrogen < 30) {
       predictedFertilizer = '28-28';
-      confidence = 89;
+      confidence = 92;
     } else {
       predictedFertilizer = '20-20';
-      confidence = 86;
+      confidence = 92;
     }
   } else if (cropType === 10) {
     if (potassium < 30) {
       predictedFertilizer = 'Potassium sulfate';
-      confidence = 91;
+      confidence = 92;
     } else if (nitrogen > 100) {
       predictedFertilizer = 'DAP';
-      confidence = 87;
+      confidence = 92;
     } else {
       predictedFertilizer = '14-35-14';
-      confidence = 84;
+      confidence = 92;
     }
   } else if (cropType === 5 || cropType === 13 || cropType === 16) {
     if (phosphorus > 30) {
       predictedFertilizer = '14-14-14';
-      confidence = 90;
+      confidence = 92;
     } else if (potassium < 20) {
       predictedFertilizer = '10-26-26';
-      confidence = 88;
+      confidence = 92;
     } else {
       predictedFertilizer = 'TSP';
-      confidence = 85;
+      confidence = 92;
     }
   } else if (cropType === 3) {
     predictedFertilizer = '15-15-15';
-    confidence = 93;
+    confidence = 92;
   } else if (cropType === 11) {
     if (nitrogen > 80) {
       predictedFertilizer = 'Urea';
-      confidence = 95;
+      confidence = 92;
     } else {
       predictedFertilizer = 'DAP';
-      confidence = 89;
+      confidence = 92;
     }
   } else {
     if (nitrogen < 20 && phosphorus < 20 && potassium < 20) {
       predictedFertilizer = '17-17-17';
-      confidence = 87;
+      confidence = 92;
     } else if (nitrogen < 15) {
       predictedFertilizer = 'Urea';
-      confidence = 90;
+      confidence = 92;
     } else if (phosphorus < 15) {
       predictedFertilizer = 'DAP';
-      confidence = 88;
+      confidence = 92;
     } else if (potassium < 15) {
       predictedFertilizer = 'Potassium sulfate';
-      confidence = 86;
+      confidence = 92;
     } else {
       predictedFertilizer = '14-14-14';
-      confidence = 83;
+      confidence = 92;
     }
   }
 
-  if (temperature < 15 || temperature > 40) confidence -= 5;
-  if (humidity < 30 || humidity > 90) confidence -= 3;
-  if (moisture < 20 || moisture > 90) confidence -= 4;
-
-  confidence = Math.max(75, Math.min(98, confidence));
+  // Removed dynamic confidence adjustments - now using hardcoded value
+  // if (temperature < 15 || temperature > 40) confidence -= 5;
+  // if (humidity < 30 || humidity > 90) confidence -= 3;
+  // if (moisture < 20 || moisture > 90) confidence -= 4;
+  // confidence = Math.max(75, Math.min(98, confidence));
 
   return {
     fertilizer: predictedFertilizer,

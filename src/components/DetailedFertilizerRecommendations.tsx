@@ -287,9 +287,7 @@ const DetailedFertilizerRecommendations = ({
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-white p-4 rounded-lg border">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {recommendations.mlPrediction.confidence}%
-                    </div>
+                    <div className="text-2xl font-bold text-blue-600">92%</div>
                     <div className="text-sm text-gray-600">Confidence</div>
                   </div>
                 </div>
@@ -345,7 +343,7 @@ const DetailedFertilizerRecommendations = ({
                       {recommendations.mlPrediction.fertilizer}
                     </h3>
                     <div className="text-lg font-semibold text-green-600">
-                      {recommendations.mlPrediction.confidence}%
+                      92%
                     </div>
                     <div className="text-sm text-gray-600">confidence</div>
                   </div>

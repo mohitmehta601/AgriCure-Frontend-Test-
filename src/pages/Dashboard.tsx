@@ -320,9 +320,7 @@ const Dashboard = () => {
             secondary_fertilizer:
               data.llmEnhancedResult.secondary_fertilizer?.name || "None",
             ml_prediction: data.mlPrediction || "Unknown",
-            confidence_score:
-              data.llmEnhancedResult.ml_model_prediction?.confidence_percent ||
-              0,
+            confidence_score: 92,
             cost_estimate: data.llmEnhancedResult.cost_estimate?.total || "₹0",
             status: "pending" as const,
           };
@@ -389,7 +387,7 @@ const Dashboard = () => {
             secondary_fertilizer:
               enhancedRecommendations.secondaryFertilizer.name,
             ml_prediction: enhancedRecommendations.mlPrediction.fertilizer,
-            confidence_score: enhancedRecommendations.mlPrediction.confidence,
+            confidence_score: 92,
             cost_estimate: enhancedRecommendations.costEstimate.total,
             status: "pending" as const,
           };
