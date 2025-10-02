@@ -48,7 +48,7 @@ import {
   type SoilData,
   type LocationData,
 } from "@/services/locationSoilService";
-                               
+
 interface FormData {
   selectedFarmId: string;
   soilPH: string;
@@ -204,11 +204,7 @@ const EnhancedFertilizerForm = ({
 
       toast({
         title: t("common.success"),
-        description: `Soil type detected: ${
-          soilData.soil_type
-        } (${LocationSoilService.getConfidenceDescription(
-          soilData.confidence
-        )})`,
+        description: `Soil type detected: ${soilData.soil_type}`,
       });
     } catch (error) {
       console.error("Error getting location:", error);
@@ -840,12 +836,7 @@ const EnhancedFertilizerForm = ({
                           <div className="font-medium text-green-800">
                             {newFarm.soilType}
                           </div>
-                          <div className="text-xs text-green-600">
-                            Confidence:{" "}
-                            {LocationSoilService.getConfidenceDescription(
-                              newFarm.soilData.confidence
-                            )}
-                          </div>
+                          <div className="text-xs text-green-600"></div>
                         </div>
                       </div>
                     </div>

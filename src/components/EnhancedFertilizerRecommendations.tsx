@@ -153,14 +153,6 @@ const EnhancedFertilizerRecommendations = ({
                 </div>
               )}
             </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-grass-600">
-                92%
-              </div>
-              <div className="text-xs sm:text-sm text-gray-500">
-                {t("dashboard.confidence")}
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>

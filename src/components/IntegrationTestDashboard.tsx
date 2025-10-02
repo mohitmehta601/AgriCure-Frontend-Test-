@@ -194,7 +194,7 @@ const IntegrationTestDashboard: React.FC = () => {
 
       updateTest(2, {
         status: "success",
-        message: `Predicted: ${prediction.fertilizer} (92% confidence)`,
+        message: `Predicted: ${prediction.fertilizer}`,
         details: prediction,
         duration,
       });
@@ -232,7 +232,7 @@ const IntegrationTestDashboard: React.FC = () => {
 
       updateTest(3, {
         status: "success",
-        message: `Enhanced: ${primaryFertilizer} (92% confidence)`,
+        message: `Enhanced: ${primaryFertilizer}`,
         details: enhancedPrediction,
         duration,
       });
@@ -320,7 +320,7 @@ const IntegrationTestDashboard: React.FC = () => {
 
       updateTest(6, {
         status: "success",
-        message: `Soil type detected: ${soilData.soil_type} (92% confidence)`,
+        message: `Soil type detected: ${soilData.soil_type}`,
         details: soilData,
         duration,
       });

@@ -587,13 +587,6 @@ export const EnhancedMLDemo: React.FC = () => {
                             <strong>Type:</strong>{" "}
                             {locationData.soil_data.soil_type}
                           </p>
-                          <p>
-                            <strong>Confidence:</strong>{" "}
-                            {(locationData.soil_data.confidence * 100).toFixed(
-                              1
-                            )}
-                            %
-                          </p>
                         </div>
                       </div>
 

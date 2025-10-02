@@ -68,9 +68,7 @@ const SoilDataForm = ({ onSubmit }) => {
       });
       toast({
         title: "Soil type detected",
-        description: `${r.soil_type} • confidence ${(
-          r.confidence * 100
-        ).toFixed(0)}%`,
+        description: `${r.soil_type}`,
       });
     } catch (err: any) {
       toast({ title: "Soil detection failed", description: err.message });
@@ -118,15 +116,6 @@ const SoilDataForm = ({ onSubmit }) => {
     });
     setIsLoading(false);
   };
-
-  const confidenceLabel =
-    autoSoil.confidence == null
-      ? ""
-      : autoSoil.confidence >= 0.8
-      ? "High"
-      : autoSoil.confidence >= 0.6
-      ? "Medium"
-      : "Low";
 
   return (
     <Card>
@@ -330,12 +319,6 @@ const SoilDataForm = ({ onSubmit }) => {
               <Label>Soil Type (Auto-detected)</Label>
               <div className="mt-2 flex items-center gap-3 rounded-md border p-3">
                 <span className="font-medium">{autoSoil.type ?? "—"}</span>
-                {autoSoil.confidence != null && (
-                  <span className="text-xs rounded px-2 py-0.5 bg-emerald-50 border border-emerald-200">
-                    Confidence: {confidenceLabel} (
-                    {((autoSoil.confidence || 0) * 100).toFixed(0)}%)
-                  </span>
-                )}
                 {autoSoil.sources?.length ? (
                   <span className="text-xs text-muted-foreground">
                     Sources: {autoSoil.sources.join(", ")}

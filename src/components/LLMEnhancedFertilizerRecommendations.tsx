@@ -93,11 +93,7 @@ const LLMEnhancedFertilizerRecommendations = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="px-4 sm:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="text-center p-3 bg-white rounded-lg border border-purple-200">
-              <div className="text-2xl font-bold text-purple-600">92%</div>
-              <div className="text-xs text-gray-500">ML Confidence</div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="text-center p-3 bg-white rounded-lg border border-purple-200">
               <div className="text-lg font-semibold text-gray-800">
                 {farm.size} {farm.unit}

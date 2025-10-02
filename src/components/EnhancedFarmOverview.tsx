@@ -875,12 +875,7 @@ const EnhancedFarmOverview = ({ user }: EnhancedFarmOverviewProps) => {
                           <div className="font-medium text-green-800">
                             {newFarm.soilType}
                           </div>
-                          <div className="text-xs text-green-600">
-                            Confidence:{" "}
-                            {LocationSoilService.getConfidenceDescription(
-                              newFarm.soilData.confidence
-                            )}
-                          </div>
+                          <div className="text-xs text-green-600"></div>
                         </div>
                       </div>
                     </div>
