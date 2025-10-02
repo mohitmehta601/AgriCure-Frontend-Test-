@@ -456,12 +456,12 @@ const Dashboard = () => {
         onProfileUpdate={handleProfileUpdate}
       />
 
-      <div className="container mx-auto px-3 xs:px-4 sm:px-6 py-3 xs:py-4 sm:py-6 md:py-8">
+      <div className="container mx-auto px-2 xs:px-3 sm:px-4 md:px-6 py-3 xs:py-4 sm:py-6 md:py-8">
         <div className="mb-3 xs:mb-4 sm:mb-6 md:mb-8">
-          <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-1 xs:mb-2 leading-tight">
+          <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 xs:mb-2 leading-tight">
             {t("dashboard.title")}
           </h1>
-          <p className="text-xs xs:text-sm sm:text-base md:text-lg text-gray-600 leading-relaxed">
+          <p className="text-xs xs:text-sm sm:text-base text-gray-600 leading-relaxed">
             {t("dashboard.subtitle")}
           </p>
         </div>
@@ -470,24 +470,27 @@ const Dashboard = () => {
           defaultValue="overview"
           className="space-y-3 xs:space-y-4 sm:space-y-6"
         >
-          <TabsList className="grid w-full grid-cols-3 h-auto gap-1 xs:gap-2 p-1">
+          <TabsList className="grid w-full grid-cols-3 h-auto gap-0.5 xs:gap-1 sm:gap-2 p-1 bg-gray-100 rounded-lg">
             <TabsTrigger
               value="overview"
-              className="text-xs xs:text-sm sm:text-base px-1 xs:px-2 sm:px-3 md:px-4 py-2 xs:py-3 data-[state=active]:bg-grass-600 data-[state=active]:text-white"
+              className="text-xs xs:text-sm sm:text-base px-1 xs:px-2 sm:px-3 md:px-4 py-2.5 xs:py-3 sm:py-3 font-medium whitespace-nowrap data-[state=active]:bg-grass-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md transition-all duration-200 hover:bg-grass-50"
             >
-              {t("dashboard.overview")}
+              <span className="hidden xs:inline">{t("dashboard.overview")}</span>
+              <span className="xs:hidden">Overview</span>
             </TabsTrigger>
             <TabsTrigger
               value="soil-analysis"
-              className="text-xs xs:text-sm sm:text-base px-1 xs:px-2 sm:px-3 md:px-4 py-2 xs:py-3 data-[state=active]:bg-grass-600 data-[state=active]:text-white"
+              className="text-xs xs:text-sm sm:text-base px-1 xs:px-2 sm:px-3 md:px-4 py-2.5 xs:py-3 sm:py-3 font-medium whitespace-nowrap data-[state=active]:bg-grass-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md transition-all duration-200 hover:bg-grass-50"
             >
-              {t("dashboard.soilAnalysis")}
+              <span className="hidden sm:inline">{t("dashboard.soilAnalysis")}</span>
+              <span className="sm:hidden">Soil Analysis</span>
             </TabsTrigger>
             <TabsTrigger
               value="recommendations"
-              className="text-xs xs:text-sm sm:text-base px-1 xs:px-2 sm:px-3 md:px-4 py-2 xs:py-3 data-[state=active]:bg-grass-600 data-[state=active]:text-white"
+              className="text-xs xs:text-sm sm:text-base px-1 xs:px-2 sm:px-3 md:px-4 py-2.5 xs:py-3 sm:py-3 font-medium whitespace-nowrap data-[state=active]:bg-grass-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md transition-all duration-200 hover:bg-grass-50"
             >
-              {t("dashboard.recommendations")}
+              <span className="hidden xs:inline">{t("dashboard.recommendations")}</span>
+              <span className="xs:hidden">Recs</span>
             </TabsTrigger>
           </TabsList>
 

@@ -95,37 +95,46 @@ const RealTimeSoilAnalysis = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Connection Status and Refresh */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+      <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between space-y-2 xs:space-y-0 bg-gray-50 p-3 xs:p-4 rounded-lg border">
         <div className="flex items-center space-x-2">
           {isConnected ? (
             <>
               <Wifi className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-              <span className="text-xs sm:text-sm text-green-600">{t('dashboard.connectedToThingSpeak')}</span>
+              <span className="text-xs xs:text-sm font-medium text-green-600">{t('dashboard.connectedToThingSpeak')}</span>
             </>
           ) : (
             <>
               <WifiOff className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
-              <span className="text-xs sm:text-sm text-red-600">{t('dashboard.usingDemoData')}</span>
+              <span className="text-xs xs:text-sm font-medium text-red-600">{t('dashboard.usingDemoData')}</span>
             </>
           )}
         </div>
-        <Button onClick={() => { refreshData(); loadHistoricalData(); }} variant="outline" size="sm" disabled={loading} className="text-xs sm:text-sm">
-          <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+        <Button 
+          onClick={() => { refreshData(); loadHistoricalData(); }} 
+          variant="outline" 
+          size="sm" 
+          disabled={loading} 
+          className="text-xs xs:text-sm w-full xs:w-auto"
+        >
+          <RefreshCw className={`h-3 w-3 xs:h-4 xs:w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           {t('dashboard.refreshData')}
         </Button>
       </div>
 
       {/* Real-time Parameter Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-        <Card>
-          <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">{t('dashboard.nitrogen')}</CardTitle>
+      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 xs:gap-4 sm:gap-6">
+        <Card className="hover:shadow-md transition-shadow duration-200 bg-white">
+          <CardHeader className="pb-2 px-3 xs:px-4 sm:px-6 pt-3 xs:pt-4 sm:pt-6">
+            <CardTitle className="text-xs xs:text-sm font-medium text-gray-700">{t('dashboard.nitrogen')}</CardTitle>
           </CardHeader>
-          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-            <div className="text-lg sm:text-2xl font-bold mb-2">{data?.nitrogen.toFixed(1)} mg/kg</div>
-            <Progress value={clampPercent(((data?.nitrogen ?? 0) / 240) * 100)} className="h-1 sm:h-2 mb-2" />
+          <CardContent className="px-3 xs:px-4 sm:px-6 pb-3 xs:pb-4 sm:pb-6">
+            <div className="text-base xs:text-lg sm:text-2xl font-bold mb-2 text-gray-900">
+              {data?.nitrogen.toFixed(1)} 
+              <span className="text-xs xs:text-sm font-normal text-gray-500 ml-1">mg/kg</span>
+            </div>
+            <Progress value={clampPercent(((data?.nitrogen ?? 0) / 240) * 100)} className="h-1.5 xs:h-2 mb-2" />
             {(() => { const s = getNutrientStatus('nitrogen', data?.nitrogen ?? 0); return (
-              <div className={`text-xs ${s.color}`}>{s.status.toUpperCase()}</div>
+              <div className={`text-xs font-medium ${s.color}`}>{s.status.toUpperCase()}</div>
             ); })()}
           </CardContent>
         </Card>
