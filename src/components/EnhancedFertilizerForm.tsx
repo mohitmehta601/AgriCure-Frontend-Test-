@@ -434,28 +434,31 @@ const EnhancedFertilizerForm = ({
               variant="outline"
               size="sm"
               disabled={!isConnected || !realTimeData}
-              className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 hover:from-blue-100 hover:to-indigo-100 text-blue-700 hover:text-blue-800 transition-all duration-300"
+              className="w-full xs:w-auto bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 hover:from-blue-100 hover:to-indigo-100 text-blue-700 hover:text-blue-800 transition-all duration-300 text-xs xs:text-sm"
             >
-              <Zap className="h-4 w-4 mr-2" />
+              <Zap className="h-3 xs:h-4 w-3 xs:w-4 mr-2" />
               {isConnected
                 ? t("form.autoFillWithSensorData")
                 : t("form.sensorDataUnavailable")}
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="px-4 sm:px-6 py-6">
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <CardContent className="px-3 xs:px-4 sm:px-6 py-4 xs:py-5 sm:py-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-3 xs:space-y-4 sm:space-y-6"
+          >
             {/* Farm Selection */}
-            <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center space-x-2">
-                <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-grass-600" />
+            <div className="space-y-3 xs:space-y-4">
+              <h3 className="text-sm xs:text-base sm:text-lg font-semibold text-gray-800 flex items-center space-x-2">
+                <Leaf className="h-3 xs:h-4 sm:h-5 w-3 xs:w-4 sm:w-5 text-grass-600" />
                 <span>Farm Selection</span>
               </h3>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-col xs:flex-row items-stretch xs:items-end space-y-2 xs:space-y-0 xs:space-x-2">
                 <div className="flex-1">
                   <Label
                     htmlFor="farmSelect"
-                    className="text-sm sm:text-base font-medium text-gray-700"
+                    className="text-xs xs:text-sm sm:text-base font-medium text-gray-700"
                   >
                     Select Farm *
                   </Label>
@@ -464,7 +467,7 @@ const EnhancedFertilizerForm = ({
                     value={formData.selectedFarmId}
                     disabled={farmsLoading}
                   >
-                    <SelectTrigger className="transition-all duration-300 focus:ring-2 focus:ring-grass-500 focus:border-grass-500 hover:border-grass-300">
+                    <SelectTrigger className="transition-all duration-300 focus:ring-2 focus:ring-grass-500 focus:border-grass-500 hover:border-grass-300 h-8 xs:h-9 sm:h-10 text-xs xs:text-sm">
                       <SelectValue
                         placeholder={
                           farmsLoading ? "Loading farms..." : "Choose a farm"
@@ -495,19 +498,19 @@ const EnhancedFertilizerForm = ({
                   onClick={() => setIsAddFarmOpen(true)}
                   variant="outline"
                   size="sm"
-                  className="mt-6 bg-grass-50 border-grass-200 hover:bg-grass-100 text-grass-700 hover:text-grass-800 transition-all duration-300"
+                  className="w-full xs:w-auto xs:mt-6 bg-grass-50 border-grass-200 hover:bg-grass-100 text-grass-700 hover:text-grass-800 transition-all duration-300 text-xs xs:text-sm h-8 xs:h-9 sm:h-10"
                 >
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-3 xs:h-4 w-3 xs:w-4 mr-1 xs:mr-2" />
                   Add Farm
                 </Button>
               </div>
 
               {selectedFarm && (
-                <div className="p-4 bg-gradient-to-r from-grass-50 to-green-50 rounded-lg border border-grass-200">
-                  <h4 className="font-semibold text-grass-800 mb-2">
+                <div className="p-3 xs:p-4 bg-gradient-to-r from-grass-50 to-green-50 rounded-lg border border-grass-200">
+                  <h4 className="font-semibold text-grass-800 mb-2 text-sm xs:text-base">
                     Selected Farm Details
                   </h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                  <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2 text-xs xs:text-sm">
                     <div>
                       <span className="text-gray-600">Size:</span>
                       <span className="ml-1 font-medium">
@@ -695,20 +698,20 @@ const EnhancedFertilizerForm = ({
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <div className="flex flex-col xs:flex-row gap-3 xs:gap-4 pt-3 xs:pt-4">
               <Button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-grass-600 to-green-600 hover:from-grass-700 hover:to-green-700 text-sm sm:text-base py-2 sm:py-3 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                className="flex-1 bg-gradient-to-r from-grass-600 to-green-600 hover:from-grass-700 hover:to-green-700 text-xs xs:text-sm sm:text-base py-2 xs:py-3 sm:py-3 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
                 disabled={isLoading || !selectedFarm}
               >
                 {isLoading ? (
                   <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-3 xs:h-4 w-3 xs:w-4 border-b-2 border-white"></div>
                     <span>Getting AI Recommendations...</span>
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2">
-                    <Brain className="h-4 w-4" />
+                    <Brain className="h-3 xs:h-4 w-3 xs:w-4" />
                     <span>Get ML Recommendations</span>
                   </div>
                 )}
@@ -716,7 +719,7 @@ const EnhancedFertilizerForm = ({
               <Button
                 type="reset"
                 variant="outline"
-                className="flex-1 sm:flex-none text-sm sm:text-base py-2 sm:py-3 transition-all duration-300 hover:scale-105 border-grass-300 hover:bg-grass-50"
+                className="flex-1 xs:flex-none text-xs xs:text-sm sm:text-base py-2 xs:py-3 sm:py-3 transition-all duration-300 hover:scale-105 border-grass-300 hover:bg-grass-50"
                 onClick={() =>
                   setFormData({
                     selectedFarmId: "",
@@ -735,7 +738,7 @@ const EnhancedFertilizerForm = ({
             </div>
 
             {!selectedFarm && (
-              <p className="text-sm text-gray-500 text-center mt-2">
+              <p className="text-xs xs:text-sm text-gray-500 text-center mt-2">
                 Please select a farm first to get ML-powered recommendations
               </p>
             )}

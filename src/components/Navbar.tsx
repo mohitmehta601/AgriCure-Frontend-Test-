@@ -12,9 +12,9 @@ const Navbar = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
       });
     }
     setIsMenuOpen(false);
@@ -22,91 +22,117 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-green-100">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-3 xs:px-4 py-3 xs:py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
-            <img src="/logo.png" alt="AgriCure Logo" className="h-8 w-8" />
-            <span className="text-2xl font-bold text-grass-800">AgriCure</span>
+          <Link to="/" className="flex items-center space-x-1 xs:space-x-2">
+            <img
+              src="/logo.png"
+              alt="AgriCure Logo"
+              className="h-6 xs:h-7 sm:h-8 w-6 xs:w-7 sm:w-8"
+            />
+            <span className="text-lg xs:text-xl sm:text-2xl font-bold text-grass-800">
+              AgriCure
+            </span>
           </Link>
-          
-          <div className="hidden md:flex items-center space-x-8">
-            <button 
-              onClick={() => scrollToSection('home')}
-              className="text-gray-700 hover:text-grass-600 transition-colors font-medium"
+
+          <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+            <button
+              onClick={() => scrollToSection("home")}
+              className="text-gray-700 hover:text-grass-600 transition-colors font-medium text-sm xl:text-base"
             >
-              {t('nav.home')}
+              {t("nav.home")}
             </button>
-            <button 
-              onClick={() => scrollToSection('features')}
-              className="text-gray-700 hover:text-grass-600 transition-colors font-medium"
+            <button
+              onClick={() => scrollToSection("features")}
+              className="text-gray-700 hover:text-grass-600 transition-colors font-medium text-sm xl:text-base"
             >
-              {t('nav.features')}
+              {t("nav.features")}
             </button>
-            <button 
-              onClick={() => scrollToSection('how-it-works')}
-              className="text-gray-700 hover:text-grass-600 transition-colors font-medium"
+            <button
+              onClick={() => scrollToSection("how-it-works")}
+              className="text-gray-700 hover:text-grass-600 transition-colors font-medium text-sm xl:text-base"
             >
-              {t('nav.howItWorks')}
+              {t("nav.howItWorks")}
             </button>
           </div>
-          
-          <div className="hidden sm:flex items-center space-x-4">
+
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-3 xl:space-x-4">
             <LanguageSwitcher />
-            <Button asChild variant="ghost">
-              <Link to="/login">{t('nav.login')}</Link>
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="text-xs lg:text-sm px-2 lg:px-3"
+            >
+              <Link to="/login">{t("nav.login")}</Link>
             </Button>
-            <Button asChild className="bg-grass-600 hover:bg-grass-700">
-              <Link to="/signup">{t('nav.signup')}</Link>
+            <Button
+              asChild
+              size="sm"
+              className="bg-grass-600 hover:bg-grass-700 text-xs lg:text-sm px-2 lg:px-3"
+            >
+              <Link to="/signup">{t("nav.signup")}</Link>
             </Button>
           </div>
 
-          <div className="flex sm:hidden items-center space-x-2">
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/login">{t('nav.login')}</Link>
+          <div className="flex md:hidden items-center space-x-1 xs:space-x-2">
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="text-xs px-2 py-1"
+            >
+              <Link to="/login">{t("nav.login")}</Link>
             </Button>
-            <Button asChild size="sm" className="bg-grass-600 hover:bg-grass-700">
-              <Link to="/signup">{t('nav.start')}</Link>
+            <Button
+              asChild
+              size="sm"
+              className="bg-grass-600 hover:bg-grass-700 text-xs px-2 py-1"
+            >
+              <Link to="/signup">{t("nav.start")}</Link>
             </Button>
           </div>
 
           <button
-            className="md:hidden p-2 ml-2"
+            className="lg:hidden p-1 xs:p-2 ml-1 xs:ml-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle navigation menu"
           >
             {isMenuOpen ? (
-              <X className="h-6 w-6 text-gray-700" />
+              <X className="h-5 xs:h-6 w-5 xs:w-6 text-gray-700" />
             ) : (
-              <Menu className="h-6 w-6 text-gray-700" />
+              <Menu className="h-5 xs:h-6 w-5 xs:w-6 text-gray-700" />
             )}
           </button>
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-gray-200">
-            <div className="flex flex-col space-y-4 pt-4">
-              <button 
-                onClick={() => scrollToSection('home')}
-                className="text-left text-gray-700 hover:text-grass-600 transition-colors font-medium py-2"
+          <div className="lg:hidden mt-3 xs:mt-4 pb-3 xs:pb-4 border-t border-gray-200">
+            <div className="flex flex-col space-y-3 xs:space-y-4 pt-3 xs:pt-4">
+              <button
+                onClick={() => scrollToSection("home")}
+                className="text-left text-gray-700 hover:text-grass-600 transition-colors font-medium py-2 text-sm xs:text-base"
               >
-                {t('nav.home')}
+                {t("nav.home")}
               </button>
-              <button 
-                onClick={() => scrollToSection('features')}
-                className="text-left text-gray-700 hover:text-grass-600 transition-colors font-medium py-2"
+              <button
+                onClick={() => scrollToSection("features")}
+                className="text-left text-gray-700 hover:text-grass-600 transition-colors font-medium py-2 text-sm xs:text-base"
               >
-                {t('nav.features')}
+                {t("nav.features")}
               </button>
-              <button 
-                onClick={() => scrollToSection('how-it-works')}
-                className="text-left text-gray-700 hover:text-grass-600 transition-colors font-medium py-2"
+              <button
+                onClick={() => scrollToSection("how-it-works")}
+                className="text-left text-gray-700 hover:text-grass-600 transition-colors font-medium py-2 text-sm xs:text-base"
               >
-                {t('nav.howItWorks')}
+                {t("nav.howItWorks")}
               </button>
-              
-              <div className="pt-2 border-t border-gray-200">
+
+              <div className="pt-2 border-t border-gray-200 md:hidden">
                 <div className="flex items-center justify-between py-2">
-                  <span className="text-sm font-medium text-gray-700">{t('language.select')}</span>
+                  <span className="text-xs xs:text-sm font-medium text-gray-700">
+                    {t("language.select")}
+                  </span>
                   <LanguageSwitcher />
                 </div>
               </div>

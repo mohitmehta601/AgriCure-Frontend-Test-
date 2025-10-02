@@ -456,55 +456,64 @@ const Dashboard = () => {
         onProfileUpdate={handleProfileUpdate}
       />
 
-      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
-        <div className="mb-4 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+      <div className="container mx-auto px-3 xs:px-4 sm:px-6 py-3 xs:py-4 sm:py-6 md:py-8">
+        <div className="mb-3 xs:mb-4 sm:mb-6 md:mb-8">
+          <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-1 xs:mb-2 leading-tight">
             {t("dashboard.title")}
           </h1>
-          <p className="text-sm sm:text-base text-gray-600">
+          <p className="text-xs xs:text-sm sm:text-base md:text-lg text-gray-600 leading-relaxed">
             {t("dashboard.subtitle")}
           </p>
         </div>
 
-        <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-3 h-auto">
+        <Tabs
+          defaultValue="overview"
+          className="space-y-3 xs:space-y-4 sm:space-y-6"
+        >
+          <TabsList className="grid w-full grid-cols-3 h-auto gap-1 xs:gap-2 p-1">
             <TabsTrigger
               value="overview"
-              className="text-xs sm:text-sm px-2 sm:px-4 py-2"
+              className="text-xs xs:text-sm sm:text-base px-1 xs:px-2 sm:px-3 md:px-4 py-2 xs:py-3 data-[state=active]:bg-grass-600 data-[state=active]:text-white"
             >
               {t("dashboard.overview")}
             </TabsTrigger>
             <TabsTrigger
               value="soil-analysis"
-              className="text-xs sm:text-sm px-2 sm:px-4 py-2"
+              className="text-xs xs:text-sm sm:text-base px-1 xs:px-2 sm:px-3 md:px-4 py-2 xs:py-3 data-[state=active]:bg-grass-600 data-[state=active]:text-white"
             >
               {t("dashboard.soilAnalysis")}
             </TabsTrigger>
             <TabsTrigger
               value="recommendations"
-              className="text-xs sm:text-sm px-2 sm:px-4 py-2"
+              className="text-xs xs:text-sm sm:text-base px-1 xs:px-2 sm:px-3 md:px-4 py-2 xs:py-3 data-[state=active]:bg-grass-600 data-[state=active]:text-white"
             >
               {t("dashboard.recommendations")}
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-4 sm:space-y-6">
+          <TabsContent
+            value="overview"
+            className="space-y-3 xs:space-y-4 sm:space-y-6"
+          >
             <EnhancedFarmOverview user={user} />
           </TabsContent>
 
-          <TabsContent value="soil-analysis" className="space-y-4 sm:space-y-6">
+          <TabsContent
+            value="soil-analysis"
+            className="space-y-3 xs:space-y-4 sm:space-y-6"
+          >
             <RealTimeSoilAnalysis />
           </TabsContent>
 
           <TabsContent
             value="recommendations"
-            className="space-y-4 sm:space-y-6"
+            className="space-y-3 xs:space-y-4 sm:space-y-6"
           >
             <EnhancedFertilizerForm onSubmit={handleFormSubmit} user={user} />
             {isGenerating && (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-grass-600"></div>
-                <span className="ml-2 text-sm sm:text-base">
+              <div className="flex items-center justify-center py-6 xs:py-8">
+                <div className="animate-spin rounded-full h-6 xs:h-7 sm:h-8 w-6 xs:w-7 sm:w-8 border-b-2 border-grass-600"></div>
+                <span className="ml-2 xs:ml-3 text-xs xs:text-sm sm:text-base font-medium">
                   {t("form.generating")}
                 </span>
               </div>

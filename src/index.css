@@ -219,17 +219,142 @@
 }
 
 /* Responsive improvements */
+@media (max-width: 375px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  .text-xs-responsive {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+}
+
 @media (max-width: 640px) {
   .container {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-}
-
-@media (max-width: 768px) {
-  .text-responsive {
+  
+  .text-sm-responsive {
     font-size: 0.875rem;
     line-height: 1.25rem;
+  }
+  
+  .grid-responsive {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .flex-responsive {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .p-responsive {
+    padding: 1rem;
+  }
+  
+  .px-responsive {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .py-responsive {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  .space-y-responsive > * + * {
+    margin-top: 0.75rem;
+  }
+  
+  .space-x-responsive > * + * {
+    margin-left: 0.5rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .grid-tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .text-tablet-responsive {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .grid-desktop {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+/* Mobile-first responsive text */
+.text-responsive-xs { font-size: 0.75rem; line-height: 1rem; }
+.text-responsive-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-responsive-base { font-size: 1rem; line-height: 1.5rem; }
+.text-responsive-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-responsive-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.text-responsive-2xl { font-size: 1.5rem; line-height: 2rem; }
+.text-responsive-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+
+@media (min-width: 640px) {
+  .text-responsive-xs { font-size: 0.875rem; line-height: 1.25rem; }
+  .text-responsive-sm { font-size: 1rem; line-height: 1.5rem; }
+  .text-responsive-base { font-size: 1.125rem; line-height: 1.75rem; }
+  .text-responsive-lg { font-size: 1.25rem; line-height: 1.75rem; }
+  .text-responsive-xl { font-size: 1.5rem; line-height: 2rem; }
+  .text-responsive-2xl { font-size: 1.875rem; line-height: 2.25rem; }
+  .text-responsive-3xl { font-size: 2.25rem; line-height: 2.5rem; }
+}
+
+@media (min-width: 768px) {
+  .text-responsive-base { font-size: 1.25rem; line-height: 1.75rem; }
+  .text-responsive-lg { font-size: 1.5rem; line-height: 2rem; }
+  .text-responsive-xl { font-size: 1.875rem; line-height: 2.25rem; }
+  .text-responsive-2xl { font-size: 2.25rem; line-height: 2.5rem; }
+  .text-responsive-3xl { font-size: 3rem; line-height: 1; }
+}
+
+/* Responsive spacing utilities */
+.space-responsive-y > * + * { margin-top: 0.5rem; }
+.space-responsive-x > * + * { margin-left: 0.5rem; }
+
+@media (min-width: 640px) {
+  .space-responsive-y > * + * { margin-top: 1rem; }
+  .space-responsive-x > * + * { margin-left: 1rem; }
+}
+
+@media (min-width: 768px) {
+  .space-responsive-y > * + * { margin-top: 1.5rem; }
+  .space-responsive-x > * + * { margin-left: 1.5rem; }
+}
+
+/* Responsive button sizes */
+.btn-responsive {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .btn-responsive {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .btn-responsive {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
   }
 }
 

@@ -92,46 +92,53 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen gradient-bg flex items-center justify-center p-3 xs:p-4 sm:p-6">
+      <div className="w-full max-w-xs xs:max-w-sm sm:max-w-md">
         {/* Back Button */}
-        <div className="mb-4">
+        <div className="mb-3 xs:mb-4">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleBack}
-            className="flex items-center space-x-2 text-gray-600 hover:text-grass-600"
+            className="flex items-center space-x-1 xs:space-x-2 text-gray-600 hover:text-grass-600 text-xs xs:text-sm"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-3 xs:h-4 w-3 xs:w-4" />
             <span>{t("auth.backToHome")}</span>
           </Button>
         </div>
 
-        <div className="text-center mb-6 md:mb-8">
+        <div className="text-center mb-4 xs:mb-6 md:mb-8">
           <Link to="/" className="inline-flex items-center space-x-2">
-            <img src="/logo.png" alt="AgriCure Logo" className="h-8 w-8" />
-            <span className="text-2xl md:text-3xl font-bold text-grass-800">
+            <img
+              src="/logo.png"
+              alt="AgriCure Logo"
+              className="h-6 xs:h-7 sm:h-8 w-6 xs:w-7 sm:w-8"
+            />
+            <span className="text-xl xs:text-2xl sm:text-3xl font-bold text-grass-800">
               AgriCure
             </span>
           </Link>
-          <div className="mt-4 flex justify-center">
+          <div className="mt-3 xs:mt-4 flex justify-center">
             <LanguageSwitcher />
           </div>
         </div>
 
         <Card className="shadow-lg border-0">
-          <CardHeader className="text-center px-4 md:px-6">
-            <CardTitle className="text-xl md:text-2xl font-bold text-gray-900">
+          <CardHeader className="text-center px-3 xs:px-4 sm:px-6 py-4 xs:py-5 sm:py-6">
+            <CardTitle className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
               {t("auth.createAccount")}
             </CardTitle>
-            <CardDescription className="text-gray-600 text-sm md:text-base">
+            <CardDescription className="text-gray-600 text-xs xs:text-sm sm:text-base leading-relaxed mt-2">
               {t("auth.signupAccount")}
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-4 md:px-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <CardContent className="px-3 xs:px-4 sm:px-6 pb-4 xs:pb-5 sm:pb-6">
+            <form onSubmit={handleSubmit} className="space-y-3 xs:space-y-4">
               <div>
-                <Label htmlFor="productId" className="text-sm md:text-base">
+                <Label
+                  htmlFor="productId"
+                  className="text-xs xs:text-sm sm:text-base font-medium"
+                >
                   Product ID
                 </Label>
                 <div className="flex items-center space-x-2 mt-1">
@@ -143,7 +150,7 @@ const Signup = () => {
                     value={formData.productId}
                     onChange={handleChange}
                     required
-                    className="flex-1 min-w-0"
+                    className="flex-1 min-w-0 h-8 xs:h-9 sm:h-10 text-xs xs:text-sm"
                   />
                   <div className="flex-shrink-0">
                     <QRScanner onScan={handleQRScan} />
@@ -151,7 +158,10 @@ const Signup = () => {
                 </div>
               </div>
               <div>
-                <Label htmlFor="name" className="text-sm md:text-base">
+                <Label
+                  htmlFor="name"
+                  className="text-xs xs:text-sm sm:text-base font-medium"
+                >
                   {t("auth.fullName")}
                 </Label>
                 <Input
@@ -162,11 +172,14 @@ const Signup = () => {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="mt-1"
+                  className="mt-1 h-8 xs:h-9 sm:h-10 text-xs xs:text-sm"
                 />
               </div>
               <div>
-                <Label htmlFor="email" className="text-sm md:text-base">
+                <Label
+                  htmlFor="email"
+                  className="text-xs xs:text-sm sm:text-base font-medium"
+                >
                   {t("auth.email")}
                 </Label>
                 <Input
@@ -177,12 +190,15 @@ const Signup = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="mt-1"
+                  className="mt-1 h-8 xs:h-9 sm:h-10 text-xs xs:text-sm"
                 />
               </div>
 
               <div>
-                <Label htmlFor="password" className="text-sm md:text-base">
+                <Label
+                  htmlFor="password"
+                  className="text-xs xs:text-sm sm:text-base font-medium"
+                >
                   {t("auth.password")}
                 </Label>
                 <Input
@@ -193,13 +209,13 @@ const Signup = () => {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="mt-1"
+                  className="mt-1 h-8 xs:h-9 sm:h-10 text-xs xs:text-sm"
                 />
               </div>
               <div>
                 <Label
                   htmlFor="confirmPassword"
-                  className="text-sm md:text-base"
+                  className="text-xs xs:text-sm sm:text-base font-medium"
                 >
                   {t("auth.confirmPassword")}
                 </Label>
@@ -211,20 +227,20 @@ const Signup = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
-                  className="mt-1"
+                  className="mt-1 h-8 xs:h-9 sm:h-10 text-xs xs:text-sm"
                 />
               </div>
               <Button
                 type="submit"
-                className="w-full bg-grass-600 hover:bg-grass-700 text-sm md:text-base py-2 md:py-3"
+                className="w-full bg-grass-600 hover:bg-grass-700 text-xs xs:text-sm sm:text-base py-2 xs:py-3 sm:py-3 mt-4 xs:mt-5 sm:mt-6"
                 disabled={isLoading}
               >
                 {isLoading ? t("common.loading") : t("auth.createAccount")}
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
-              <p className="text-gray-600 text-sm md:text-base">
+            <div className="mt-4 xs:mt-5 sm:mt-6 text-center">
+              <p className="text-gray-600 text-xs xs:text-sm sm:text-base leading-relaxed">
                 {t("auth.alreadyHaveAccount")}{" "}
                 <Link
                   to="/login"
