@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
@@ -24,9 +30,9 @@ const Signup = () => {
   const { t } = useLanguage();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -35,9 +41,9 @@ const Signup = () => {
 
     if (formData.password !== formData.confirmPassword) {
       toast({
-        title: t('common.error'),
-        description: t('auth.passwordsDoNotMatch'),
-        variant: "destructive"
+        title: t("common.error"),
+        description: t("auth.passwordsDoNotMatch"),
+        variant: "destructive",
       });
       return;
     }
@@ -57,16 +63,16 @@ const Signup = () => {
       }
 
       toast({
-        title: t('auth.accountCreated'),
-        description: t('auth.welcomeToAgriCure'),
+        title: t("auth.accountCreated"),
+        description: t("auth.welcomeToAgriCure"),
       });
       navigate("/login");
     } catch (error: any) {
-      console.error('Signup error:', error);
+      console.error("Signup error:", error);
       toast({
-        title: t('auth.signupFailed'),
-        description: error.message || t('auth.failedToCreateAccount'),
-        variant: "destructive"
+        title: t("auth.signupFailed"),
+        description: error.message || t("auth.failedToCreateAccount"),
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -89,31 +95,37 @@ const Signup = () => {
             className="flex items-center space-x-2 text-gray-600 hover:text-grass-600"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>{t('auth.backToHome')}</span>
+            <span>{t("auth.backToHome")}</span>
           </Button>
         </div>
 
         <div className="text-center mb-6 md:mb-8">
           <Link to="/" className="inline-flex items-center space-x-2">
             <img src="/logo.png" alt="AgriCure Logo" className="h-8 w-8" />
-            <span className="text-2xl md:text-3xl font-bold text-grass-800">AgriCure</span>
+            <span className="text-2xl md:text-3xl font-bold text-grass-800">
+              AgriCure
+            </span>
           </Link>
           <div className="mt-4 flex justify-center">
             <LanguageSwitcher />
           </div>
         </div>
-        
+
         <Card className="shadow-lg border-0">
           <CardHeader className="text-center px-4 md:px-6">
-            <CardTitle className="text-xl md:text-2xl font-bold text-gray-900">{t('auth.createAccount')}</CardTitle>
+            <CardTitle className="text-xl md:text-2xl font-bold text-gray-900">
+              {t("auth.createAccount")}
+            </CardTitle>
             <CardDescription className="text-gray-600 text-sm md:text-base">
-              {t('auth.signupAccount')}
+              {t("auth.signupAccount")}
             </CardDescription>
           </CardHeader>
           <CardContent className="px-4 md:px-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="productId" className="text-sm md:text-base">{t('auth.productId')}</Label>
+                <Label htmlFor="productId" className="text-sm md:text-base">
+                  Product ID
+                </Label>
                 <Input
                   id="productId"
                   name="productId"
@@ -126,7 +138,9 @@ const Signup = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="name" className="text-sm md:text-base">{t('auth.fullName')}</Label>
+                <Label htmlFor="name" className="text-sm md:text-base">
+                  {t("auth.fullName")}
+                </Label>
                 <Input
                   id="name"
                   name="name"
@@ -139,7 +153,9 @@ const Signup = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="email" className="text-sm md:text-base">{t('auth.email')}</Label>
+                <Label htmlFor="email" className="text-sm md:text-base">
+                  {t("auth.email")}
+                </Label>
                 <Input
                   id="email"
                   name="email"
@@ -151,9 +167,11 @@ const Signup = () => {
                   className="mt-1"
                 />
               </div>
-              
+
               <div>
-                <Label htmlFor="password" className="text-sm md:text-base">{t('auth.password')}</Label>
+                <Label htmlFor="password" className="text-sm md:text-base">
+                  {t("auth.password")}
+                </Label>
                 <Input
                   id="password"
                   name="password"
@@ -166,7 +184,12 @@ const Signup = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="confirmPassword" className="text-sm md:text-base">{t('auth.confirmPassword')}</Label>
+                <Label
+                  htmlFor="confirmPassword"
+                  className="text-sm md:text-base"
+                >
+                  {t("auth.confirmPassword")}
+                </Label>
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -178,20 +201,23 @@ const Signup = () => {
                   className="mt-1"
                 />
               </div>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full bg-grass-600 hover:bg-grass-700 text-sm md:text-base py-2 md:py-3"
                 disabled={isLoading}
               >
-                {isLoading ? t('common.loading') : t('auth.createAccount')}
+                {isLoading ? t("common.loading") : t("auth.createAccount")}
               </Button>
             </form>
-            
+
             <div className="mt-6 text-center">
               <p className="text-gray-600 text-sm md:text-base">
-                {t('auth.alreadyHaveAccount')}{" "}
-                <Link to="/login" className="text-grass-600 hover:text-grass-700 font-medium">
-                  {t('auth.signInHere')}
+                {t("auth.alreadyHaveAccount")}{" "}
+                <Link
+                  to="/login"
+                  className="text-grass-600 hover:text-grass-700 font-medium"
+                >
+                  {t("auth.signInHere")}
                 </Link>
               </p>
             </div>

@@ -161,7 +161,7 @@ const ProfileModal = ({ isOpen, onClose, user, onProfileUpdate }: ProfileModalPr
                 type="tel"
                 value={profile.phone_number || ''}
                 onChange={(e) => handleChange('phone_number', e.target.value)}
-                placeholder="+1 (555) 123-4567"
+                placeholder="+91 12345-67890"
               />
             </div>
 
